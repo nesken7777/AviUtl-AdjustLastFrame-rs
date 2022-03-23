@@ -3,9 +3,15 @@ name = "Aho"
 version = "0.1.0"
 edition = "2021"
 
+[lib]
+name = "adjust_last_flame_rs"
+path = "src/lib.rs"
+crate-type = ["cdylib"]
+
 [[bin]]
 name = "complexcity-amount"
 path = "src/complexity.rs"
+
 
 [dependencies]
 complexity = "0.2.0"
