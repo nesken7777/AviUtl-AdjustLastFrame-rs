@@ -1,8 +1,8 @@
 /**
-*	memref2.h by ÖF
+*	memref2.h by ï¿½ÖF
 *
-*	memref.h ‚ğ‰ü‘¢‚µ‚ÄAauls_memref.auf ‚Å‚Í‚È‚­
-*	auls_memref.ini ‚©‚çƒAƒhƒŒƒX‚ğæ“¾‚·‚é‚æ‚¤‚É‚µ‚Ü‚µ‚½B
+*	memref.h ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ÄAauls_memref.auf ï¿½Å‚Í‚È‚ï¿½
+*	auls_memref.ini ï¿½ï¿½ï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½æ‚¤ï¿½É‚ï¿½ï¿½Ü‚ï¿½ï¿½ï¿½ï¿½B
 **/
 #pragma once
 
@@ -11,9 +11,9 @@
 #include <strsafe.h>
 #include <tchar.h>
 typedef const BYTE* LPCBYTE;
-#include "yulib/file.h"
-#include "yulib/memory.h"
-#include "aulslib/exedit.h"
+#include "../yulib/file.h"
+#include "../yulib/memory.h"
+#include "../aulslib/exedit.h"
 
 struct lua_State;
 
@@ -103,12 +103,12 @@ public:
 
 	BOOL Init(FILTER *fp)
 	{
-		// Šg’£•ÒW‚ÌDLLƒnƒ“ƒhƒ‹‚ğæ“¾‚·‚éB
+		// ï¿½gï¿½ï¿½ï¿½ÒWï¿½ï¿½DLLï¿½nï¿½ï¿½ï¿½hï¿½ï¿½ï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½B
 		m_exedit = (UINT_PTR)::LoadLibraryEx(
 			TEXT("exedit.auf"), 0, LOAD_WITH_ALTERED_SEARCH_PATH);
 
 		if (!m_exedit)
-			return FALSE; // Šg’£•ÒW‚Ìƒ[ƒh‚É¸”s‚µ‚½B
+			return FALSE; // ï¿½gï¿½ï¿½ï¿½ÒWï¿½Ìƒï¿½ï¿½[ï¿½hï¿½Éï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½B
 
 		return loadAddress(fp);
 	}
@@ -117,38 +117,38 @@ public:
 	{
 		try
 		{
-			// iniFilePath ‚ÉƒAƒhƒŒƒXƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒX‚ğŠi”[‚·‚éB
+			// iniFilePath ï¿½ÉƒAï¿½hï¿½ï¿½ï¿½Xï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½pï¿½Xï¿½ï¿½ï¿½iï¿½[ï¿½ï¿½ï¿½ï¿½B
 			TCHAR iniFilePath[MAX_PATH] = {};
 			::GetModuleFileName(fp->dll_hinst, iniFilePath, _countof(iniFilePath));
 			::PathRemoveFileSpec(iniFilePath);
 			::PathAppend(iniFilePath, TEXT("auls_memref.ini"));
 
-			// appName ‚É exedit.auf ƒtƒ@ƒCƒ‹‚ÌƒnƒbƒVƒ…’l‚ğŠi”[‚·‚éB
+			// appName ï¿½ï¿½ exedit.auf ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìƒnï¿½bï¿½Vï¿½ï¿½ï¿½lï¿½ï¿½ï¿½iï¿½[ï¿½ï¿½ï¿½ï¿½B
 			TCHAR appName[MAX_PATH] = {};
 			{
-				// exedit.auf ƒtƒ@ƒCƒ‹‚Ìƒtƒ@ƒCƒ‹ƒpƒX‚ğŠi”[‚·‚éB
+				// exedit.auf ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½Ìƒtï¿½@ï¿½Cï¿½ï¿½ï¿½pï¿½Xï¿½ï¿½ï¿½iï¿½[ï¿½ï¿½ï¿½ï¿½B
 				TCHAR path[MAX_PATH] = {};
 				::GetModuleFileName((HMODULE)m_exedit, path, _countof(path));
 
-				// ƒtƒ@ƒCƒ‹‚ğŠJ‚­B
+				// ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½Jï¿½ï¿½ï¿½B
 				yulib::CFile file; file.OpenExisting(path);
 
-				// ƒtƒ@ƒCƒ‹ƒf[ƒ^‚ğæ“¾‚·‚éB
+				// ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½B
 				DWORD fileSize = file.Size();
 				yulib::CMemory<BYTE> fileData; fileData.Alloc(fileSize, true);
 				BOOL result = file.Read(fileData, fileSize);
 
 				if (!result)
-					return FALSE; // ƒtƒ@ƒCƒ‹ƒf[ƒ^‚Ì“Ç‚İ‚İ‚É¸”s‚µ‚½B
+					return FALSE; // ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½Ì“Ç‚İï¿½ï¿½İ‚Éï¿½ï¿½sï¿½ï¿½ï¿½ï¿½ï¿½B
 
-				// ƒtƒ@ƒCƒ‹ƒf[ƒ^‚©‚ç CRC32 ‚ğæ“¾‚·‚éB
+				// ï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½fï¿½[ï¿½^ï¿½ï¿½ï¿½ï¿½ CRC32 ï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½B
 				DWORD crc32 = yulib::Crc32(fileData, fileSize);
 
 				::StringCbPrintf(appName, sizeof(appName), TEXT("%08X"), crc32);
 			}
 
-			// ƒAƒhƒŒƒXƒtƒ@ƒCƒ‹‚©‚çƒAƒhƒŒƒX‚ğæ“¾‚·‚éB
-			// “Ç‚İ‚ñ‚¾”’l‚ª 0 ‚Ìê‡‚Í—áŠO‚ª“Š‚°‚ç‚ê‚éB
+			// ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½tï¿½@ï¿½Cï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Aï¿½hï¿½ï¿½ï¿½Xï¿½ï¿½ï¿½æ“¾ï¿½ï¿½ï¿½ï¿½B
+			// ï¿½Ç‚İï¿½ï¿½ñ‚¾ï¿½ï¿½lï¿½ï¿½ 0 ï¿½Ìê‡ï¿½Í—ï¿½Oï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½B
 
 			m_Exedit_StaticFilterTable = getHex(iniFilePath, appName, TEXT("Exedit_StaticFilterTable"));
 			m_Exedit_SortedObjectTable_LayerIndexEnd = getHex(iniFilePath, appName, TEXT("Exedit_SortedObjectTable_LayerIndexEnd"));
