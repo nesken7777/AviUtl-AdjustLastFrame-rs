@@ -5,8 +5,8 @@ use std::ffi::c_void;
 use windows::core::*;
 use windows::Win32::Foundation::*;
 use windows::Win32::Graphics::Gdi::HFONT;
-//Option<unsafe extern "system" fn(fp:*mut FILTER,fpip:*mut FILTER_PROC_INFO)->i32>;
-//Option<unsafe extern "system" fn()->i32>
+
+
 pub type MULTI_THREAD_FUNC = Option<
     unsafe extern "system" fn(
         thread_id: i32,
