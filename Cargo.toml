@@ -16,3 +16,7 @@ path = "src/complexity.rs"
 [dependencies]
 complexity = "0.2.0"
 syn = "1.0.89"
+
+[dependencies.windows]
+version = "0.34.0"
+features = ["Win32_Foundation","Win32_Graphics_Gdi"]
