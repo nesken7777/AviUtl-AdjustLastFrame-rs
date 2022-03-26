@@ -10,7 +10,6 @@ pub mod yulib_memory;
 use crate::filter::*;
 use auls_memref2::CMemref;
 use std::cell::RefCell;
-use std::ffi::c_void;
 use std::ptr::null_mut;
 use windows_sys::Win32::Foundation::BOOL;
 use windows_sys::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
