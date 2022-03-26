@@ -61,7 +61,7 @@ impl CMemref {
     unsafe fn loadAddress(&mut self, fp: *mut FILTER) -> BOOL {
         let mut iniFilePath: PathType = [0; MAX_PATH as usize];
         let iniFilePathPtr = iniFilePath.as_mut_ptr();
-        GetModuleFileNameA((*fp).dll_hinst, iniFilePathPtr, iniFilePath.len() as u32);
+        GetModuleFileNameA((*fp).dll_hinst as isize, iniFilePathPtr, iniFilePath.len() as u32);
         PathRemoveFileSpecA(iniFilePathPtr);
         PathAppendA(iniFilePathPtr, b"auls_memref.ini".as_ptr());
         let mut _appName: PathType = [0; MAX_PATH as usize];

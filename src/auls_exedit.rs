@@ -87,7 +87,7 @@ impl TRACK_MODE {
 pub unsafe fn Exedit_GetWindow(fp: *mut FILTER) -> HWND {
     let exedit = Exedit_GetFilter(fp);
     if !exedit.is_null() {
-        (*exedit).hwnd
+        (*exedit).hwnd as isize
     } else {
         null_mut::<HWND>() as HWND
     }
