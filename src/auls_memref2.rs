@@ -51,7 +51,7 @@ pub struct CMemref {
 impl CMemref {
     pub unsafe fn Init(&mut self, fp: *mut FILTER) -> BOOL {
         self.m_exedit =
-            LoadLibraryExA(b"exedit.auf".as_ptr(), 0, LOAD_WITH_ALTERED_SEARCH_PATH) as u64;
+            LoadLibraryExA(b"exedit.auf\0".as_ptr(), 0, LOAD_WITH_ALTERED_SEARCH_PATH) as u64;
         if self.m_exedit == 0 {
             return false as BOOL;
         }
@@ -63,7 +63,7 @@ impl CMemref {
         let iniFilePathPtr = iniFilePath.as_mut_ptr();
         GetModuleFileNameA((*fp).dll_hinst as isize, iniFilePathPtr, iniFilePath.len() as u32);
         PathRemoveFileSpecA(iniFilePathPtr);
-        PathAppendA(iniFilePathPtr, b"auls_memref.ini".as_ptr());
+        PathAppendA(iniFilePathPtr, b"auls_memref.ini\0".as_ptr());
         let mut _appName: PathType = [0; MAX_PATH as usize];
         {
             let mut path: PathType = [0; MAX_PATH as usize];
@@ -84,138 +84,138 @@ impl CMemref {
         self.m_Exedit_StaticFilterTable = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_StaticFilterTable".as_ptr(),
+            b"Exedit_StaticFilterTable\0".as_ptr(),
         );
         self.m_Exedit_StaticFilterTable = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_StaticFilterTable".as_ptr(),
+            b"Exedit_StaticFilterTable\0".as_ptr(),
         );
         self.m_Exedit_SortedObjectTable_LayerIndexEnd = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_SortedObjectTable_LayerIndexEnd".as_ptr(),
+            b"Exedit_SortedObjectTable_LayerIndexEnd\0".as_ptr(),
         );
         self.m_Exedit_AliasNameBuffer = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_AliasNameBuffer".as_ptr(),
+            b"Exedit_AliasNameBuffer\0".as_ptr(),
         );
         self.m_Exedit_SortedObjectCount = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_SortedObjectCount".as_ptr(),
+            b"Exedit_SortedObjectCount\0".as_ptr(),
         );
         self.m_Exedit_ObjDlg_CommandTarget = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_ObjDlg_CommandTarget".as_ptr(),
+            b"Exedit_ObjDlg_CommandTarget\0".as_ptr(),
         );
         self.m_Exedit_SortedObjectTable_LayerIndexBegin = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_SortedObjectTable_LayerIndexBegin".as_ptr(),
+            b"Exedit_SortedObjectTable_LayerIndexBegin\0".as_ptr(),
         );
         self.m_Exedit_ObjDlg_FilterStatus = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_ObjDlg_FilterStatus".as_ptr(),
+            b"Exedit_ObjDlg_FilterStatus\0".as_ptr(),
         );
         self.m_Exedit_SortedObjectTable = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_SortedObjectTable".as_ptr(),
+            b"Exedit_SortedObjectTable\0".as_ptr(),
         );
         self.m_Exedit_ObjDlg_ObjectIndex = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_ObjDlg_ObjectIndex".as_ptr(),
+            b"Exedit_ObjDlg_ObjectIndex\0".as_ptr(),
         );
         self.m_Exedit_SceneSetting =
-            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_SceneSetting".as_ptr());
+            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_SceneSetting\0".as_ptr());
         self.m_Exedit_LoadedFilterTable = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_LoadedFilterTable".as_ptr(),
+            b"Exedit_LoadedFilterTable\0".as_ptr(),
         );
         self.m_Exedit_LayerSetting =
-            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_LayerSetting".as_ptr());
+            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_LayerSetting\0".as_ptr());
         self.m_Exedit_SceneDisplaying = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_SceneDisplaying".as_ptr(),
+            b"Exedit_SceneDisplaying\0".as_ptr(),
         );
         self.m_Exedit_TextBuffer =
-            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_TextBuffer".as_ptr());
+            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_TextBuffer\0".as_ptr());
         self.m_Exedit_TraScript_ProcessingTrackBarIndex = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_TraScript_ProcessingTrackBarIndex".as_ptr(),
+            b"Exedit_TraScript_ProcessingTrackBarIndex\0".as_ptr(),
         );
         self.m_Exedit_TraScript_ProcessingObjectIndex = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_TraScript_ProcessingObjectIndex".as_ptr(),
+            b"Exedit_TraScript_ProcessingObjectIndex\0".as_ptr(),
         );
         self.m_Exedit_ScriptProcessingFilter = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_ScriptProcessingFilter".as_ptr(),
+            b"Exedit_ScriptProcessingFilter\0".as_ptr(),
         );
         self.m_Exedit_LuaState =
-            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_LuaState".as_ptr());
+            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_LuaState\0".as_ptr());
         self.m_Exedit_ObjectBufferInfo = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_ObjectBufferInfo".as_ptr(),
+            b"Exedit_ObjectBufferInfo\0".as_ptr(),
         );
         self.m_Exedit_CameraZBuffer =
-            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_CameraZBuffer".as_ptr());
+            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_CameraZBuffer\0".as_ptr());
         self.m_Exedit_UndoInfo =
-            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_UndoInfo".as_ptr());
+            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_UndoInfo\0".as_ptr());
 
         self.m_Exedit_ObjectBufferInfo_exdata_size =
-            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_UndoInfo".as_ptr());
+            Self::getHex(iniFilePathPtr, appNamePtr, b"Exedit_UndoInfo\0".as_ptr());
         self.m_Exedit_ObjectBufferInfo_max_data_num = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_ObjectBufferInfo_max_data_num".as_ptr(),
+            b"Exedit_ObjectBufferInfo_max_data_num\0".as_ptr(),
         );
         self.m_Exedit_ObjectBufferInfo_data = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_ObjectBufferInfo_data".as_ptr(),
+            b"Exedit_ObjectBufferInfo_data\0".as_ptr(),
         );
         self.m_Exedit_ObjectBufferInfo_exdata = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_ObjectBufferInfo_exdata".as_ptr(),
+            b"Exedit_ObjectBufferInfo_exdata\0".as_ptr(),
         );
 
         self.m_Exedit_UndoInfo_current_id = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_UndoInfo_current_id".as_ptr(),
+            b"Exedit_UndoInfo_current_id\0".as_ptr(),
         );
         self.m_Exedit_UndoInfo_write_offset = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_UndoInfo_write_offset".as_ptr(),
+            b"Exedit_UndoInfo_write_offset\0".as_ptr(),
         );
         self.m_Exedit_UndoInfo_object_num = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_UndoInfo_object_num".as_ptr(),
+            b"Exedit_UndoInfo_object_num\0".as_ptr(),
         );
         self.m_Exedit_UndoInfo_buffer_ptr = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_UndoInfo_buffer_ptr".as_ptr(),
+            b"Exedit_UndoInfo_buffer_ptr\0".as_ptr(),
         );
         self.m_Exedit_UndoInfo_buffer_size = Self::getHex(
             iniFilePathPtr,
             appNamePtr,
-            b"Exedit_UndoInfo_buffer_size".as_ptr(),
+            b"Exedit_UndoInfo_buffer_size\0".as_ptr(),
         );
         true as BOOL
     }
