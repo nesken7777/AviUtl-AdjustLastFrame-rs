@@ -9,10 +9,9 @@ pub mod yulib_generic;
 pub mod yulib_memory;
 use crate::filter::*;
 use auls_memref2::CMemref;
-use windows_sys::Win32::System::SystemServices::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH};
-use std::cell::RefCell;
 use std::ptr::null_mut;
 use windows_sys::Win32::Foundation::{BOOL, HINSTANCE};
+use windows_sys::Win32::System::SystemServices::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH};
 use windows_sys::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
 
 pub static mut g_memref: CMemref = CMemref {
@@ -80,22 +79,8 @@ unsafe fn adjustLastFrame(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL 
 }
 
 #[no_mangle]
-pub extern "system" fn DllMain(_: HINSTANCE, Reason: u32, _: usize) -> i32 {
-    match Reason {
-        DLL_PROCESS_ATTACH => {
-            println!("プロセスあたっちで");
-        }
-        DLL_PROCESS_DETACH => {
-            println!("プロセスでたっちで");
-        }
-        _ => {}
-    }
-    1
-}
-
-#[no_mangle]
-pub unsafe extern "system" fn GetFilterTable() -> *mut FILTER_DLL {
-    static mut g_Filter: RefCell<FILTER_DLL> = RefCell::new(FILTER_DLL {
+pub unsafe extern "stdcall" fn GetFilterTable() -> *mut FILTER_DLL {
+    static mut g_Filter: FILTER_DLL = FILTER_DLL {
         flag: FILTER_FLAG_NO_CONFIG
             | FILTER_FLAG_ALWAYS_ACTIVE
             | FILTER_FLAG_DISP_FILTER
@@ -133,22 +118,22 @@ pub unsafe extern "system" fn GetFilterTable() -> *mut FILTER_DLL {
         func_save_end: None,
         dll_path: null_mut(),
         reserve: [0; 2],
-    });
-    g_Filter.get_mut()
+    };
+    &mut g_Filter
 }
 
 //BOOL
 #[no_mangle]
-pub unsafe extern "system" fn func_init(fp: *mut FILTER) -> BOOL {
+pub unsafe extern "stdcall" fn func_init(fp: *mut FILTER) -> BOOL {
     return g_memref.Init(fp); // auls::CMemref の初期化。
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn func_exit(_fp: *mut FILTER) -> BOOL {
+pub unsafe extern "stdcall" fn func_exit(_fp: *mut FILTER) -> BOOL {
     return false as BOOL;
 }
 
 #[no_mangle]
-pub unsafe extern "system" fn func_proc(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
+pub unsafe extern "stdcall" fn func_proc(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
     return adjustLastFrame(fp, fpip);
 }

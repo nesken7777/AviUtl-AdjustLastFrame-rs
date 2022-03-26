@@ -14,7 +14,7 @@ pub const FILTER_FLAG_DISP_FILTER: i32 = 32768;
 pub const FILTER_FLAG_EX_INFORMATION: i32 = 262144;
 
 pub type MULTI_THREAD_FUNC = Option<
-    unsafe extern "system" fn(
+    unsafe extern "stdcall" fn(
         thread_id: i32,
         thread_num: i32,
         param1: *mut c_void,
@@ -127,43 +127,43 @@ pub struct FRAME_STATUS {
 #[repr(C)]
 #[derive(Copy, Clone)]
 pub struct EXFUNC {
-    pub get_ycp_ofs: Option<unsafe extern "system" fn(editp: *mut c_void, n: i32, ofs: i32)>,
-    pub get_ycp: Option<unsafe extern "system" fn(editp: *mut c_void, n: i32) -> *mut c_void>,
-    pub get_pixelp: Option<unsafe extern "system" fn(editp: *mut c_void, n: i32) -> *mut c_void>,
+    pub get_ycp_ofs: Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32, ofs: i32)>,
+    pub get_ycp: Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32) -> *mut c_void>,
+    pub get_pixelp: Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32) -> *mut c_void>,
     pub get_audio:
-        Option<unsafe extern "system" fn(editp: *mut c_void, n: i32, buf: *mut c_void) -> i32>,
-    pub is_editing: Option<unsafe extern "system" fn(editp: *mut c_void) -> BOOL>,
-    pub is_saving: Option<unsafe extern "system" fn(editp: *mut c_void) -> BOOL>,
-    pub get_frame: Option<unsafe extern "system" fn(editp: *mut c_void) -> i32>,
-    pub get_frame_n: Option<unsafe extern "system" fn(editp: *mut c_void) -> i32>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32, buf: *mut c_void) -> i32>,
+    pub is_editing: Option<unsafe extern "stdcall" fn(editp: *mut c_void) -> BOOL>,
+    pub is_saving: Option<unsafe extern "stdcall" fn(editp: *mut c_void) -> BOOL>,
+    pub get_frame: Option<unsafe extern "stdcall" fn(editp: *mut c_void) -> i32>,
+    pub get_frame_n: Option<unsafe extern "stdcall" fn(editp: *mut c_void) -> i32>,
     pub get_frame_size:
-        Option<unsafe extern "system" fn(editp: *mut c_void, w: *mut i32, h: *mut i32) -> BOOL>,
-    pub set_frame: Option<unsafe extern "system" fn(editp: *mut c_void, n: i32) -> i32>,
-    pub set_frame_n: Option<unsafe extern "system" fn(editp: *mut c_void, n: i32) -> i32>,
-    pub copy_frame: Option<unsafe extern "system" fn(editp: *mut c_void, d: i32, s: i32) -> BOOL>,
-    pub copy_video: Option<unsafe extern "system" fn(editp: *mut c_void, d: i32, s: i32) -> BOOL>,
-    pub copy_audio: Option<unsafe extern "system" fn(editp: *mut c_void, d: i32, s: i32) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, w: *mut i32, h: *mut i32) -> BOOL>,
+    pub set_frame: Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32) -> i32>,
+    pub set_frame_n: Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32) -> i32>,
+    pub copy_frame: Option<unsafe extern "stdcall" fn(editp: *mut c_void, d: i32, s: i32) -> BOOL>,
+    pub copy_video: Option<unsafe extern "stdcall" fn(editp: *mut c_void, d: i32, s: i32) -> BOOL>,
+    pub copy_audio: Option<unsafe extern "stdcall" fn(editp: *mut c_void, d: i32, s: i32) -> BOOL>,
     pub copy_clip:
-        Option<unsafe extern "system" fn(hwnd: HWND, pixelp: *mut c_void, w: i32, h: i32) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(hwnd: HWND, pixelp: *mut c_void, w: i32, h: i32) -> BOOL>,
     pub paste_clip:
-        Option<unsafe extern "system" fn(hwnd: HWND, editp: *mut c_void, n: i32) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(hwnd: HWND, editp: *mut c_void, n: i32) -> BOOL>,
     pub get_frame_status: Option<
-        unsafe extern "system" fn(editp: *mut c_void, n: i32, fsp: *mut FRAME_STATUS) -> BOOL,
+        unsafe extern "stdcall" fn(editp: *mut c_void, n: i32, fsp: *mut FRAME_STATUS) -> BOOL,
     >,
     pub set_frame_status: Option<
-        unsafe extern "system" fn(editp: *mut c_void, n: i32, fsp: *mut FRAME_STATUS) -> BOOL,
+        unsafe extern "stdcall" fn(editp: *mut c_void, n: i32, fsp: *mut FRAME_STATUS) -> BOOL,
     >,
-    pub is_saveframe: Option<unsafe extern "system" fn(editp: *mut c_void, n: i32) -> BOOL>,
-    pub is_keyframe: Option<unsafe extern "system" fn(editp: *mut c_void, n: i32) -> BOOL>,
-    pub is_recompress: Option<unsafe extern "system" fn(editp: *mut c_void, n: i32) -> BOOL>,
-    pub filter_window_update: Option<unsafe extern "system" fn(fp: *mut c_void) -> BOOL>,
-    pub is_filter_window_disp: Option<unsafe extern "system" fn(fp: *mut c_void) -> BOOL>,
+    pub is_saveframe: Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32) -> BOOL>,
+    pub is_keyframe: Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32) -> BOOL>,
+    pub is_recompress: Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32) -> BOOL>,
+    pub filter_window_update: Option<unsafe extern "stdcall" fn(fp: *mut c_void) -> BOOL>,
+    pub is_filter_window_disp: Option<unsafe extern "stdcall" fn(fp: *mut c_void) -> BOOL>,
     pub get_file_info:
-        Option<unsafe extern "system" fn(editp: *mut c_void, fip: *mut FILE_INFO) -> BOOL>,
-    pub get_config_name: Option<unsafe extern "system" fn(editp: *mut c_void, n: i32) -> *mut u8>,
-    pub is_filter_active: Option<unsafe extern "system" fn(fp: *mut c_void) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, fip: *mut FILE_INFO) -> BOOL>,
+    pub get_config_name: Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32) -> *mut u8>,
+    pub is_filter_active: Option<unsafe extern "stdcall" fn(fp: *mut c_void) -> BOOL>,
     pub get_pixel_filtered: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             editp: *mut c_void,
             n: i32,
             pixelp: *mut c_void,
@@ -172,25 +172,25 @@ pub struct EXFUNC {
         ) -> BOOL,
     >,
     pub get_audio_filtered:
-        Option<unsafe extern "system" fn(editp: *mut c_void, n: i32, buf: *mut c_void) -> i32>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32, buf: *mut c_void) -> i32>,
     pub get_select_frame:
-        Option<unsafe extern "system" fn(editp: *mut c_void, s: *mut i32, e: *mut i32) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, s: *mut i32, e: *mut i32) -> BOOL>,
     pub set_select_frame:
-        Option<unsafe extern "system" fn(editp: *mut c_void, s: i32, e: i32) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, s: i32, e: i32) -> BOOL>,
     pub rgb2yc:
-        Option<unsafe extern "system" fn(ycp: *mut PIXEL_YC, pixelp: *mut PIXEL, w: i32) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(ycp: *mut PIXEL_YC, pixelp: *mut PIXEL, w: i32) -> BOOL>,
     pub yc2rgb:
-        Option<unsafe extern "system" fn(pixelp: *mut PIXEL, ycp: *mut PIXEL_YC, w: i32) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(pixelp: *mut PIXEL, ycp: *mut PIXEL_YC, w: i32) -> BOOL>,
     pub dlg_get_load_name:
-        Option<unsafe extern "system" fn(name: *mut u8, filter: *mut u8, def: *mut u8) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(name: *mut u8, filter: *mut u8, def: *mut u8) -> BOOL>,
     pub dlg_get_save_name:
-        Option<unsafe extern "system" fn(name: *mut u8, filter: *mut u8, def: *mut u8) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(name: *mut u8, filter: *mut u8, def: *mut u8) -> BOOL>,
     pub ini_load_int:
-        Option<unsafe extern "system" fn(fp: *mut c_void, key: *mut u8, n: i32) -> i32>,
+        Option<unsafe extern "stdcall" fn(fp: *mut c_void, key: *mut u8, n: i32) -> i32>,
     pub ini_save_int:
-        Option<unsafe extern "system" fn(fp: *mut c_void, key: *mut u8, n: i32) -> i32>,
+        Option<unsafe extern "stdcall" fn(fp: *mut c_void, key: *mut u8, n: i32) -> i32>,
     pub ini_load_str: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut c_void,
             key: *mut u8,
             str_: *mut u8,
@@ -198,16 +198,16 @@ pub struct EXFUNC {
         ) -> BOOL,
     >,
     pub ini_save_str:
-        Option<unsafe extern "system" fn(fp: *mut c_void, key: *mut u8, str_: *mut u8) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(fp: *mut c_void, key: *mut u8, str_: *mut u8) -> BOOL>,
     pub get_source_file_info: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             editp: *mut c_void,
             fip: *mut FILE_INFO,
             source_file_id: i32,
         ) -> BOOL,
     >,
     pub get_source_video_number: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             editp: *mut c_void,
             n: i32,
             source_file_id: *mut i32,
@@ -215,10 +215,10 @@ pub struct EXFUNC {
         ) -> BOOL,
     >,
     pub get_sys_info:
-        Option<unsafe extern "system" fn(editp: *mut c_void, sip: *mut SYS_INFO) -> BOOL>,
-    pub get_filterp: Option<unsafe extern "system" fn(filter_id: i32) -> *mut c_void>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, sip: *mut SYS_INFO) -> BOOL>,
+    pub get_filterp: Option<unsafe extern "stdcall" fn(filter_id: i32) -> *mut c_void>,
     pub get_ycp_filtering: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut c_void,
             editp: *mut c_void,
             n: i32,
@@ -226,7 +226,7 @@ pub struct EXFUNC {
         ) -> *mut c_void,
     >,
     pub get_audio_filtering: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut c_void,
             editp: *mut c_void,
             n: i32,
@@ -234,17 +234,17 @@ pub struct EXFUNC {
         ) -> i32,
     >,
     pub set_ycp_filtering_cache_size: Option<
-        unsafe extern "system" fn(fp: *mut c_void, w: i32, h: i32, d: i32, flag: i32) -> BOOL,
+        unsafe extern "stdcall" fn(fp: *mut c_void, w: i32, h: i32, d: i32, flag: i32) -> BOOL,
     >,
     pub get_ycp_filtering_cache: Option<
-        unsafe extern "system" fn(fp: *mut c_void, editp: *mut c_void, n: i32) -> *mut c_void,
+        unsafe extern "stdcall" fn(fp: *mut c_void, editp: *mut c_void, n: i32) -> *mut c_void,
     >,
     pub get_ycp_source_cache:
-        Option<unsafe extern "system" fn(editp: *mut c_void, n: i32, ofs: i32) -> *mut c_void>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32, ofs: i32) -> *mut c_void>,
     pub get_disp_pixelp:
-        Option<unsafe extern "system" fn(editp: *mut c_void, format: u32) -> *mut c_void>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, format: u32) -> *mut c_void>,
     pub get_pixel_source: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             editp: *mut c_void,
             n: i32,
             pixelp: *mut c_void,
@@ -252,7 +252,7 @@ pub struct EXFUNC {
         ) -> BOOL,
     >,
     pub get_pixel_filtered_ex: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             editp: *mut c_void,
             n: i32,
             pixelp: *mut c_void,
@@ -262,7 +262,7 @@ pub struct EXFUNC {
         ) -> BOOL,
     >,
     pub get_ycp_filtering_cache_ex: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut c_void,
             editp: *mut c_void,
             n: i32,
@@ -271,16 +271,16 @@ pub struct EXFUNC {
         ) -> *mut PIXEL_YC,
     >,
     pub exec_multi_thread_func: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             func: MULTI_THREAD_FUNC,
             param1: *mut c_void,
             param2: *mut c_void,
         ) -> BOOL,
     >,
-    pub create_yc: Option<unsafe extern "system" fn() -> *mut PIXEL_YC>,
-    pub delete_yc: Option<unsafe extern "system" fn(ycp: *mut PIXEL_YC)>,
+    pub create_yc: Option<unsafe extern "stdcall" fn() -> *mut PIXEL_YC>,
+    pub delete_yc: Option<unsafe extern "stdcall" fn(ycp: *mut PIXEL_YC)>,
     pub load_image: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             ycp: *mut PIXEL_YC,
             file: *mut u8,
             w: *mut i32,
@@ -289,7 +289,7 @@ pub struct EXFUNC {
         ) -> BOOL,
     >,
     pub resize_yc: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             ycp: *mut PIXEL_YC,
             w: i32,
             h: i32,
@@ -301,7 +301,7 @@ pub struct EXFUNC {
         ),
     >,
     pub copy_yc: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             ycp: *mut PIXEL_YC,
             x: i32,
             y: i32,
@@ -314,7 +314,7 @@ pub struct EXFUNC {
         ),
     >,
     pub draw_text: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             ycp: *mut PIXEL_YC,
             x: i32,
             y: i32,
@@ -329,18 +329,18 @@ pub struct EXFUNC {
         ),
     >,
     pub avi_file_open: Option<
-        unsafe extern "system" fn(file: *mut u8, fip: *mut FILE_INFO, flag: i32) -> AVI_FILE_HANDLE,
+        unsafe extern "stdcall" fn(file: *mut u8, fip: *mut FILE_INFO, flag: i32) -> AVI_FILE_HANDLE,
     >,
-    pub avi_file_close: Option<unsafe extern "system" fn(afh: AVI_FILE_HANDLE)>,
+    pub avi_file_close: Option<unsafe extern "stdcall" fn(afh: AVI_FILE_HANDLE)>,
     pub avi_file_read_video:
-        Option<unsafe extern "system" fn(afh: AVI_FILE_HANDLE, ycp: *mut PIXEL_YC, n: i32) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(afh: AVI_FILE_HANDLE, ycp: *mut PIXEL_YC, n: i32) -> BOOL>,
     pub avi_file_read_audio:
-        Option<unsafe extern "system" fn(afh: AVI_FILE_HANDLE, buf: *mut c_void, n: i32) -> i32>,
+        Option<unsafe extern "stdcall" fn(afh: AVI_FILE_HANDLE, buf: *mut c_void, n: i32) -> i32>,
     pub avi_file_get_video_pixelp:
-        Option<unsafe extern "system" fn(afh: AVI_FILE_HANDLE, n: i32) -> *mut c_void>,
-    pub get_avi_file_filter: Option<unsafe extern "system" fn(type_: i32) -> *mut u8>,
+        Option<unsafe extern "stdcall" fn(afh: AVI_FILE_HANDLE, n: i32) -> *mut c_void>,
+    pub get_avi_file_filter: Option<unsafe extern "stdcall" fn(type_: i32) -> *mut u8>,
     pub avi_file_read_audio_sample: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             afh: AVI_FILE_HANDLE,
             start: i32,
             length: i32,
@@ -348,13 +348,13 @@ pub struct EXFUNC {
         ) -> i32,
     >,
     pub avi_file_set_audio_sample_rate: Option<
-        unsafe extern "system" fn(afh: AVI_FILE_HANDLE, audio_rate: i32, audio_ch: i32) -> i32,
+        unsafe extern "stdcall" fn(afh: AVI_FILE_HANDLE, audio_rate: i32, audio_ch: i32) -> i32,
     >,
     pub get_frame_status_table:
-        Option<unsafe extern "system" fn(editp: *mut c_void, type_: i32) -> *mut u8>,
-    pub set_undo: Option<unsafe extern "system" fn(editp: *mut c_void) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, type_: i32) -> *mut u8>,
+    pub set_undo: Option<unsafe extern "stdcall" fn(editp: *mut c_void) -> BOOL>,
     pub add_menu_item: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut c_void,
             name: *mut u8,
             hwnd: HWND,
@@ -364,10 +364,10 @@ pub struct EXFUNC {
         ) -> BOOL,
     >,
     pub edit_open:
-        Option<unsafe extern "system" fn(editp: *mut c_void, file: *mut u8, flag: i32) -> BOOL>,
-    pub edit_close: Option<unsafe extern "system" fn(editp: *mut c_void) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, file: *mut u8, flag: i32) -> BOOL>,
+    pub edit_close: Option<unsafe extern "stdcall" fn(editp: *mut c_void) -> BOOL>,
     pub edit_output: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             editp: *mut c_void,
             file: *mut u8,
             flag: i32,
@@ -375,7 +375,7 @@ pub struct EXFUNC {
         ) -> BOOL,
     >,
     pub set_config:
-        Option<unsafe extern "system" fn(editp: *mut c_void, n: i32, name: *mut u8) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(editp: *mut c_void, n: i32, name: *mut u8) -> BOOL>,
     pub reserve: [i32; 7usize],
 }
 
@@ -394,12 +394,12 @@ pub struct FILTER {
     pub check_name: *mut *mut u8,
     pub check_default: *mut i32,
     pub func_proc:
-        Option<unsafe extern "system" fn(fp: *mut c_void, fpip: *mut FILTER_PROC_INFO) -> BOOL>,
-    pub func_init: Option<unsafe extern "system" fn(fp: *mut c_void) -> BOOL>,
-    pub func_exit: Option<unsafe extern "system" fn(fp: *mut c_void) -> BOOL>,
-    pub func_update: Option<unsafe extern "system" fn(fp: *mut c_void, status: i32) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(fp: *mut c_void, fpip: *mut FILTER_PROC_INFO) -> BOOL>,
+    pub func_init: Option<unsafe extern "stdcall" fn(fp: *mut c_void) -> BOOL>,
+    pub func_exit: Option<unsafe extern "stdcall" fn(fp: *mut c_void) -> BOOL>,
+    pub func_update: Option<unsafe extern "stdcall" fn(fp: *mut c_void, status: i32) -> BOOL>,
     pub func_WndProc: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             hwnd: HWND,
             message: u32,
             wparam: WPARAM,
@@ -414,16 +414,16 @@ pub struct FILTER {
     pub ex_data_size: i32,
     pub information: *mut u8,
     pub func_save_start: Option<
-        unsafe extern "system" fn(fp: *mut c_void, s: i32, e: i32, editp: *mut c_void) -> BOOL,
+        unsafe extern "stdcall" fn(fp: *mut c_void, s: i32, e: i32, editp: *mut c_void) -> BOOL,
     >,
     pub func_save_end:
-        Option<unsafe extern "system" fn(fp: *mut c_void, editp: *mut c_void) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(fp: *mut c_void, editp: *mut c_void) -> BOOL>,
     pub exfunc: *mut EXFUNC,
     pub hwnd: HWND,
     pub dll_hinst: HINSTANCE,
     pub ex_data_def: *mut c_void,
     pub func_is_saveframe: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut c_void,
             editp: *mut c_void,
             saveno: i32,
@@ -434,7 +434,7 @@ pub struct FILTER {
         ) -> BOOL,
     >,
     pub func_project_load: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut c_void,
             editp: *mut c_void,
             data: *mut c_void,
@@ -442,7 +442,7 @@ pub struct FILTER {
         ) -> BOOL,
     >,
     pub func_project_save: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut c_void,
             editp: *mut c_void,
             data: *mut c_void,
@@ -450,7 +450,7 @@ pub struct FILTER {
         ) -> BOOL,
     >,
     pub func_modify_title: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut c_void,
             editp: *mut c_void,
             frame: i32,
@@ -477,12 +477,12 @@ pub struct FILTER_DLL {
     pub check_name: *mut *mut u8,
     pub check_default: *mut i32,
     pub func_proc:
-        Option<unsafe extern "system" fn(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL>,
-    pub func_init: Option<unsafe extern "system" fn(fp: *mut FILTER) -> BOOL>,
-    pub func_exit: Option<unsafe extern "system" fn(fp: *mut FILTER) -> BOOL>,
-    pub func_update: Option<unsafe extern "system" fn(fp: *mut FILTER, status: i32) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL>,
+    pub func_init: Option<unsafe extern "stdcall" fn(fp: *mut FILTER) -> BOOL>,
+    pub func_exit: Option<unsafe extern "stdcall" fn(fp: *mut FILTER) -> BOOL>,
+    pub func_update: Option<unsafe extern "stdcall" fn(fp: *mut FILTER, status: i32) -> BOOL>,
     pub func_WndProc: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             hwnd: HWND,
             message: u32,
             wparam: WPARAM,
@@ -497,16 +497,16 @@ pub struct FILTER_DLL {
     pub ex_data_size: i32,
     pub information: *const u8,
     pub func_save_start: Option<
-        unsafe extern "system" fn(fp: *mut FILTER, s: i32, e: i32, editp: *mut c_void) -> BOOL,
+        unsafe extern "stdcall" fn(fp: *mut FILTER, s: i32, e: i32, editp: *mut c_void) -> BOOL,
     >,
     pub func_save_end:
-        Option<unsafe extern "system" fn(fp: *mut FILTER, editp: *mut c_void) -> BOOL>,
+        Option<unsafe extern "stdcall" fn(fp: *mut FILTER, editp: *mut c_void) -> BOOL>,
     pub exfunc: *mut EXFUNC,
     pub hwnd: HWND,
     pub dll_hinst: HINSTANCE,
     pub ex_data_def: *mut c_void,
     pub func_is_saveframe: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut FILTER,
             editp: *mut c_void,
             saveno: i32,
@@ -517,7 +517,7 @@ pub struct FILTER_DLL {
         ) -> BOOL,
     >,
     pub func_project_load: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut FILTER,
             editp: *mut c_void,
             data: *mut c_void,
@@ -525,7 +525,7 @@ pub struct FILTER_DLL {
         ) -> BOOL,
     >,
     pub func_project_save: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut FILTER,
             editp: *mut c_void,
             data: *mut c_void,
@@ -533,7 +533,7 @@ pub struct FILTER_DLL {
         ) -> BOOL,
     >,
     pub func_modify_title: Option<
-        unsafe extern "system" fn(
+        unsafe extern "stdcall" fn(
             fp: *mut FILTER,
             editp: *mut c_void,
             frame: i32,
