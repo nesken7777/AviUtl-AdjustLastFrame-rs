@@ -11,12 +11,9 @@ use crate::filter::*;
 use auls_memref2::CMemref;
 use std::cell::RefCell;
 use std::ffi::c_void;
-use windows_sys::core::*;
 use windows_sys::Win32::Foundation::BOOL;
 use windows_sys::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
 
-struct SafePSTR(PSTR);
-unsafe impl Sync for SafePSTR {}
 
 pub static mut g_memref: CMemref = CMemref {
     m_exedit: 0,
