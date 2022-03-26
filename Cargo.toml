@@ -9,15 +9,6 @@ name = "adjust_last_flame_rs"
 path = "src/lib.rs"
 crate-type = ["cdylib"]
 
-[[bin]]
-name = "complexcity-amount"
-path = "src/complexity.rs"
-
-
-[dependencies]
-complexity = "0.2.0"
-syn = "1.0.89"
-
 [dependencies.windows-sys]
 version = "0.34.0"
 features = [
