@@ -9,9 +9,10 @@ pub mod yulib_generic;
 pub mod yulib_memory;
 use crate::filter::*;
 use auls_memref2::CMemref;
+use windows_sys::Win32::System::SystemServices::{DLL_PROCESS_ATTACH, DLL_PROCESS_DETACH};
 use std::cell::RefCell;
 use std::ptr::null_mut;
-use windows_sys::Win32::Foundation::BOOL;
+use windows_sys::Win32::Foundation::{BOOL, HINSTANCE};
 use windows_sys::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
 
 pub static mut g_memref: CMemref = CMemref {
@@ -76,6 +77,20 @@ unsafe fn adjustLastFrame(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL 
     }
     PostMessageA(exeditWindow, WM_COMMAND, 1097, 0);
     true as BOOL
+}
+
+#[no_mangle]
+pub extern "system" fn DllMain(_: HINSTANCE, Reason: u32, _: usize) -> i32 {
+    match Reason {
+        DLL_PROCESS_ATTACH => {
+            println!("プロセスあたっちで");
+        }
+        DLL_PROCESS_DETACH => {
+            println!("プロセスでたっちで");
+        }
+        _ => {}
+    }
+    1
 }
 
 #[no_mangle]
