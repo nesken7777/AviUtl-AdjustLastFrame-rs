@@ -124,16 +124,16 @@ pub unsafe extern "system" fn GetFilterTable() -> *mut FILTER_DLL {
 
 //BOOL
 #[no_mangle]
-unsafe extern "system" fn func_init(fp: *mut FILTER) -> BOOL {
+pub unsafe extern "system" fn func_init(fp: *mut FILTER) -> BOOL {
     return g_memref.Init(fp); // auls::CMemref の初期化。
 }
 
 #[no_mangle]
-unsafe extern "system" fn func_exit(_fp: *mut FILTER) -> BOOL {
+pub unsafe extern "system" fn func_exit(_fp: *mut FILTER) -> BOOL {
     return false as BOOL;
 }
 
 #[no_mangle]
-unsafe extern "system" fn func_proc(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
+pub unsafe extern "system" fn func_proc(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
     return adjustLastFrame(fp, fpip);
 }
