@@ -11,9 +11,9 @@ use crate::filter::*;
 use auls_memref2::CMemref;
 use std::cell::RefCell;
 use std::ffi::c_void;
+use std::ptr::null_mut;
 use windows_sys::Win32::Foundation::BOOL;
 use windows_sys::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
-
 
 pub static mut g_memref: CMemref = CMemref {
     m_exedit: 0,
@@ -90,34 +90,34 @@ pub unsafe extern "system" fn GetFilterTable() -> *mut FILTER_DLL {
         y: 0,
         name: "最終フレーム自動調整".as_ptr(),
         track_n: 0,
-        track_name: 0 as *mut *mut u8,
-        track_default: 0 as *mut i32,
-        track_s: 0 as *mut i32,
-        track_e: 0 as *mut i32,
+        track_name: null_mut(),
+        track_default: null_mut(),
+        track_s: null_mut(),
+        track_e: null_mut(),
         check_n: 0,
-        check_name: 0 as *mut *mut u8,
-        check_default: 0 as *mut i32,
+        check_name: null_mut(),
+        check_default: null_mut(),
         func_proc: Some(func_proc),
         func_exit: Some(func_init),
         func_init: Some(func_exit),
         func_update: None,
         func_WndProc: None,
-        track: 0 as *mut i32,
-        check: 0 as *mut i32,
-        ex_data_ptr: 0 as *mut c_void,
+        track: null_mut(),
+        check: null_mut(),
+        ex_data_ptr: null_mut(),
         ex_data_size: 0,
         information: "最終フレーム自動調整 version 1.0.3 by 蛇色\r\nmodified nesken7777".as_ptr(),
         func_save_start: None,
-        exfunc: 0 as *mut EXFUNC,
+        exfunc: null_mut(),
         hwnd: 0,
         dll_hinst: 0,
-        ex_data_def: 0 as *mut c_void,
+        ex_data_def: null_mut(),
         func_is_saveframe: None,
         func_modify_title: None,
         func_project_load: None,
         func_project_save: None,
         func_save_end: None,
-        dll_path: 0 as *mut u8,
+        dll_path: null_mut(),
         reserve: [0; 2],
     });
     g_Filter.get_mut()
