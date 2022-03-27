@@ -19,6 +19,16 @@ impl Default for CFile {
     }
 }
 
+impl Drop for CFile {
+    fn drop(&mut self) {
+        unsafe {
+            if self.file != -1 && self.file != 0 {
+                CloseHandle(self.file);
+            }
+        }
+    }
+}
+
 impl CFile {
     pub unsafe fn OpenExisting(&mut self, filename: PCSTR) -> bool {
         if !self.Close() {

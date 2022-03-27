@@ -55,7 +55,7 @@ impl CMemref {
         if self.m_exedit == 0 {
             return false as BOOL;
         }
-        return self.loadAddress(fp);
+        self.loadAddress(fp)
     }
 
     unsafe fn loadAddress(&mut self, fp: *mut FILTER) -> BOOL {

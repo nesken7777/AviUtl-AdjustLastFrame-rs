@@ -1,21 +1,28 @@
 #![allow(non_snake_case)]
 
-use std::{ffi::c_void, mem::size_of};
+use std::{ffi::c_void, mem::size_of, ptr::null_mut};
 
+use windows_sys::Win32::Foundation::BOOL;
 use windows_sys::Win32::System::Memory::*;
 
 #[repr(C)]
 pub struct CMemory<T> {
     pub mem: *mut T,
     pub size: usize,
-    pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
 }
 impl<T> Default for CMemory<T> {
     fn default() -> Self {
-        let mut s = ::std::mem::MaybeUninit::<Self>::uninit();
-        unsafe {
-            ::std::ptr::write_bytes(s.as_mut_ptr(), 0, 1);
-            s.assume_init()
+        CMemory {
+            mem: null_mut(),
+            size: 0,
+        }
+    }
+}
+
+impl<T> Drop for CMemory<T> {
+    fn drop(&mut self) {
+        if !self.mem.is_null() {
+            Memfree(self.mem as *mut c_void);
         }
     }
 }
@@ -58,4 +65,8 @@ unsafe fn MemReAlloc(mem: *mut c_void, size: usize, zeroinit: bool) -> *mut c_vo
         mem,
         size,
     )
+}
+
+fn Memfree(mem: *mut c_void) -> BOOL {
+    unsafe { HeapFree(GetProcessHeap(), 0, mem) }
 }
