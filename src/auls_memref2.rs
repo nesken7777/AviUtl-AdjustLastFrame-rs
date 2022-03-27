@@ -71,7 +71,7 @@ impl CMemref {
         {
             let mut path: PathType = [b'\0'; MAX_PATH as usize];
             GetModuleFileNameA(self.m_exedit as isize, path.as_mut_ptr(), path.len() as u32);
-            let mut file: yulib_file::CFile = yulib_file::CFile::default();
+            let mut file = yulib_file::CFile::default();
             file.OpenExisting(path.as_ptr());
             let filesize = file.Size() as usize;
             let mut fileData = yulib_memory::CMemory::<u8>::default();
