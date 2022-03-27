@@ -13,7 +13,7 @@ use std::ptr::null_mut;
 use windows_sys::Win32::Foundation::BOOL;
 use windows_sys::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
 
-pub static mut g_memref: CMemref = CMemref {
+static mut g_memref: CMemref = CMemref {
     m_exedit: 0,
     m_Exedit_StaticFilterTable: 0,
     m_Exedit_SortedObjectTable_LayerIndexEnd: 0,
