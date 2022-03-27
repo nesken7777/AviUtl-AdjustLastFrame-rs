@@ -7,9 +7,16 @@ use windows_sys::Win32::Storage::FileSystem::*;
 use windows_sys::Win32::System::SystemServices::*;
 
 #[repr(C)]
-#[derive(Default)]
 pub struct CFile {
     pub file: HANDLE,
+}
+
+impl Default for CFile {
+    fn default() -> Self {
+        CFile {
+            file: INVALID_HANDLE_VALUE,
+        }
+    }
 }
 
 impl CFile {

@@ -7,7 +7,7 @@ use windows_sys::Win32::System::Memory::*;
 #[repr(C)]
 pub struct CMemory<T> {
     pub mem: *mut T,
-    pub size: u32,
+    pub size: usize,
     pub _phantom_0: ::std::marker::PhantomData<::std::cell::UnsafeCell<T>>,
 }
 impl<T> Default for CMemory<T> {
@@ -21,20 +21,18 @@ impl<T> Default for CMemory<T> {
 }
 
 impl<T> CMemory<T> {
-    pub unsafe fn Alloc(&mut self, size: u32, zeroinit: bool) -> bool {
+    pub unsafe fn Alloc(&mut self, size: usize, zeroinit: bool) -> bool {
         if self.mem.is_null() {
-            self.mem = MemAlloc(size * size_of::<T>() as u32, zeroinit) as *mut T;
+            self.mem = MemAlloc(size * size_of::<T>(), zeroinit) as *mut T;
             if self.mem.is_null() {
                 return false;
             }
+            eprintln!("Alloc is {:X}", size * size_of::<T>());
             self.size = size;
             return true;
         } else {
-            let temp = MemReAlloc(
-                self.mem as *mut c_void,
-                size * size_of::<T>() as u32,
-                zeroinit,
-            ) as *mut T;
+            let temp =
+                MemReAlloc(self.mem as *mut c_void, size * size_of::<T>(), zeroinit) as *mut T;
             if temp.is_null() {
                 return false;
             }
@@ -45,19 +43,19 @@ impl<T> CMemory<T> {
     }
 }
 
-unsafe fn MemAlloc(size: u32, zeroinit: bool) -> *mut c_void {
+unsafe fn MemAlloc(size: usize, zeroinit: bool) -> *mut c_void {
     HeapAlloc(
         GetProcessHeap(),
         if zeroinit { HEAP_ZERO_MEMORY } else { 0 },
-        size as usize,
+        size,
     )
 }
 
-unsafe fn MemReAlloc(mem: *mut c_void, size: u32, zeroinit: bool) -> *mut c_void {
+unsafe fn MemReAlloc(mem: *mut c_void, size: usize, zeroinit: bool) -> *mut c_void {
     HeapReAlloc(
         GetProcessHeap(),
         if zeroinit { HEAP_ZERO_MEMORY } else { 0 },
         mem,
-        size as usize,
+        size,
     )
 }

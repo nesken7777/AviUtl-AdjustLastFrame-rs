@@ -41,6 +41,7 @@ pub struct EXEDIT_OBJECT {
 
 impl EXEDIT_OBJECT {
     pub fn GetFilterNum(&self) -> i32 {
+        println!("GetFilterNum");
         for i in 0..MAX_FILTER {
             if self.filter_param[i].id == FILTER_PARAM::INVALID_ID {
                 return i as i32;
@@ -49,6 +50,7 @@ impl EXEDIT_OBJECT {
         MAX_FILTER as i32
     }
     pub fn ExdataOffset(&self, idx: i32) -> u32 {
+        println!("ExdataOffset");
         self.exdata_offset + self.filter_param[idx as usize].exdata_offset
     }
 }
@@ -85,6 +87,7 @@ impl TRACK_MODE {
 
 #[inline]
 pub unsafe fn Exedit_GetWindow(fp: *mut FILTER) -> HWND {
+    println!("Exedit_GetWindow");
     let exedit = Exedit_GetFilter(fp);
     if !exedit.is_null() {
         (*exedit).hwnd as isize
@@ -95,6 +98,7 @@ pub unsafe fn Exedit_GetWindow(fp: *mut FILTER) -> HWND {
 
 #[inline]
 unsafe fn Exedit_GetFilter(fp: *mut FILTER) -> *mut FILTER {
+    println!("Exedit_GetFilter");
     let mut i = auls_aviutl::AviUtl_GetFilterNumber(fp);
     while i != 0 {
         i -= 1;

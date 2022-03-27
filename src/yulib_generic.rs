@@ -3,12 +3,12 @@ use std::ffi::c_void;
 
 #[inline]
 pub unsafe fn Crc32_3(data: *mut c_void, size: u32, table: *mut u32) -> u32 {
-    let p = data as *mut u8;
+    let mut p = data as *mut u8;
     let end = p.add(size as usize);
     let mut crc = !0;
     while p < end {
         crc = (crc >> 8) ^ *table.add((crc as u8 ^ *p) as usize);
-        *p += 1;
+        p = p.add(1);
     }
     return !crc;
 }
@@ -37,6 +37,7 @@ pub unsafe fn MakeCrc32Table(table: *mut u32) {
 }
 
 pub fn Max<T: Ord>(a: T, b: T) -> T {
+    println!("Max");
     if a >= b {
         a
     } else {

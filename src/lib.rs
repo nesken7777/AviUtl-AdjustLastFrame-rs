@@ -86,7 +86,8 @@ pub unsafe extern "stdcall" fn GetFilterTable() -> *mut FILTER_DLL {
             | FILTER_FLAG_EX_INFORMATION,
         x: 0,
         y: 0,
-        name: "最終フレーム自動調整\0".as_ptr(),
+        //name: "最終フレーム自動調整\0".as_ptr(),
+        name: b"a\0".as_ptr(),
         track_n: 0,
         track_name: null_mut(),
         track_default: null_mut(),
@@ -104,7 +105,8 @@ pub unsafe extern "stdcall" fn GetFilterTable() -> *mut FILTER_DLL {
         check: null_mut(),
         ex_data_ptr: null_mut(),
         ex_data_size: 0,
-        information: "最終フレーム自動調整 version 1.0.3 by 蛇色\r\nmodified nesken7777\0".as_ptr(),
+        //information: "最終フレーム自動調整 version 1.0.3 by 蛇色\r\nmodified nesken7777\0".as_ptr(),
+        information: b"a\0".as_ptr(),
         func_save_start: None,
         exfunc: null_mut(),
         hwnd: 0,
@@ -124,6 +126,7 @@ pub unsafe extern "stdcall" fn GetFilterTable() -> *mut FILTER_DLL {
 //BOOL
 #[no_mangle]
 pub unsafe extern "stdcall" fn func_init(fp: *mut FILTER) -> BOOL {
+    eprintln!("func_init");
     return g_memref.Init(fp); // auls::CMemref の初期化。
 }
 
@@ -134,5 +137,6 @@ pub unsafe extern "stdcall" fn func_exit(_fp: *mut FILTER) -> BOOL {
 
 #[no_mangle]
 pub unsafe extern "stdcall" fn func_proc(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
+    eprintln!("func_proc");
     return adjustLastFrame(fp, fpip);
 }
