@@ -9,10 +9,10 @@ use windows_sys::Win32::Graphics::Gdi::HFONT;
 type HWND = i32;
 type HINSTANCE = i32;
 
-pub const FILTER_FLAG_NO_CONFIG: i32 = 1048576;
-pub const FILTER_FLAG_ALWAYS_ACTIVE: i32 = 4;
-pub const FILTER_FLAG_DISP_FILTER: i32 = 32768;
-pub const FILTER_FLAG_EX_INFORMATION: i32 = 262144;
+pub const FILTER_FLAG_NO_CONFIG: i32 = 0x100000;
+pub const FILTER_FLAG_ALWAYS_ACTIVE: i32 = 0x4;
+pub const FILTER_FLAG_DISP_FILTER: i32 = 0x8000;
+pub const FILTER_FLAG_EX_INFORMATION: i32 = 0x40000;
 
 pub type MULTI_THREAD_FUNC =
     Option<fn(thread_id: i32, thread_num: i32, param1: *mut c_void, param2: *mut c_void)>;
