@@ -3,11 +3,10 @@
 
 use std::ffi::c_void;
 use std::ptr::null_mut;
+use windows_sys::core::*;
 use windows_sys::Win32::Foundation::*;
 use windows_sys::Win32::Graphics::Gdi::HFONT;
 
-type HWND = i32;
-type HINSTANCE = i32;
 
 pub const FILTER_FLAG_NO_CONFIG: i32 = 0x100000;
 pub const FILTER_FLAG_ALWAYS_ACTIVE: i32 = 0x4;
@@ -22,16 +21,16 @@ pub type AVI_FILE_HANDLE = *mut c_void;
 #[derive(Copy, Clone)]
 pub struct SYS_INFO {
     pub flag: i32,
-    pub info: *mut i8,
+    pub info: PSTR,
     pub filter_n: i32,
     pub min_w: i32,
     pub min_h: i32,
     pub max_w: i32,
     pub max_h: i32,
     pub max_frame: i32,
-    pub edit_name: *mut i8,
-    pub project_name: *mut i8,
-    pub output_name: *mut i8,
+    pub edit_name: PSTR,
+    pub project_name: PSTR,
+    pub output_name: PSTR,
     pub vram_w: i32,
     pub vram_h: i32,
     pub vram_yc_size: i32,
@@ -68,7 +67,7 @@ impl Default for SYS_INFO {
 #[repr(C)]
 pub struct FILE_INFO {
     pub flag: i32,
-    pub name: *mut u8,
+    pub name: PSTR,
     pub w: i32,
     pub h: i32,
     pub video_rate: i32,
@@ -161,7 +160,7 @@ pub struct EXFUNC {
     pub filter_window_update: Option<fn(fp: *mut c_void) -> BOOL>,
     pub is_filter_window_disp: Option<fn(fp: *mut c_void) -> BOOL>,
     pub get_file_info: Option<fn(editp: *mut c_void, fip: *mut FILE_INFO) -> BOOL>,
-    pub get_config_name: Option<fn(editp: *mut c_void, n: i32) -> *mut u8>,
+    pub get_config_name: Option<fn(editp: *mut c_void, n: i32) -> PSTR>,
     pub is_filter_active: Option<fn(fp: *mut c_void) -> BOOL>,
     pub get_pixel_filtered: Option<
         fn(editp: *mut c_void, n: i32, pixelp: *mut c_void, w: *mut i32, h: *mut i32) -> BOOL,
@@ -171,13 +170,13 @@ pub struct EXFUNC {
     pub set_select_frame: Option<fn(editp: *mut c_void, s: i32, e: i32) -> BOOL>,
     pub rgb2yc: Option<fn(ycp: *mut PIXEL_YC, pixelp: *mut PIXEL, w: i32) -> BOOL>,
     pub yc2rgb: Option<fn(pixelp: *mut PIXEL, ycp: *mut PIXEL_YC, w: i32) -> BOOL>,
-    pub dlg_get_load_name: Option<fn(name: *mut u8, filter: *mut u8, def: *mut u8) -> BOOL>,
-    pub dlg_get_save_name: Option<fn(name: *mut u8, filter: *mut u8, def: *mut u8) -> BOOL>,
-    pub ini_load_int: Option<fn(fp: *mut c_void, key: *mut u8, n: i32) -> i32>,
-    pub ini_save_int: Option<fn(fp: *mut c_void, key: *mut u8, n: i32) -> i32>,
+    pub dlg_get_load_name: Option<fn(name: PSTR, filter: PSTR, def: PSTR) -> BOOL>,
+    pub dlg_get_save_name: Option<fn(name: PSTR, filter: PSTR, def: PSTR) -> BOOL>,
+    pub ini_load_int: Option<fn(fp: *mut c_void, key: PSTR, n: i32) -> i32>,
+    pub ini_save_int: Option<fn(fp: *mut c_void, key: PSTR, n: i32) -> i32>,
     pub ini_load_str:
-        Option<fn(fp: *mut c_void, key: *mut u8, str_: *mut u8, def: *mut u8) -> BOOL>,
-    pub ini_save_str: Option<fn(fp: *mut c_void, key: *mut u8, str_: *mut u8) -> BOOL>,
+        Option<fn(fp: *mut c_void, key: PSTR, str_: PSTR, def: PSTR) -> BOOL>,
+    pub ini_save_str: Option<fn(fp: *mut c_void, key: PSTR, str_: PSTR) -> BOOL>,
     pub get_source_file_info:
         Option<fn(editp: *mut c_void, fip: *mut FILE_INFO, source_file_id: i32) -> BOOL>,
     pub get_source_video_number: Option<
@@ -221,7 +220,7 @@ pub struct EXFUNC {
     pub create_yc: Option<fn() -> *mut PIXEL_YC>,
     pub delete_yc: Option<fn(ycp: *mut PIXEL_YC)>,
     pub load_image:
-        Option<fn(ycp: *mut PIXEL_YC, file: *mut u8, w: *mut i32, h: *mut i32, flag: i32) -> BOOL>,
+        Option<fn(ycp: *mut PIXEL_YC, file: PSTR, w: *mut i32, h: *mut i32, flag: i32) -> BOOL>,
     pub resize_yc: Option<
         fn(
             ycp: *mut PIXEL_YC,
@@ -252,7 +251,7 @@ pub struct EXFUNC {
             ycp: *mut PIXEL_YC,
             x: i32,
             y: i32,
-            text: *mut u8,
+            text: PSTR,
             r: i32,
             g: i32,
             b: i32,
@@ -262,12 +261,12 @@ pub struct EXFUNC {
             h: *mut i32,
         ),
     >,
-    pub avi_file_open: Option<fn(file: *mut u8, fip: *mut FILE_INFO, flag: i32) -> AVI_FILE_HANDLE>,
+    pub avi_file_open: Option<fn(file: PSTR, fip: *mut FILE_INFO, flag: i32) -> AVI_FILE_HANDLE>,
     pub avi_file_close: Option<fn(afh: AVI_FILE_HANDLE)>,
     pub avi_file_read_video: Option<fn(afh: AVI_FILE_HANDLE, ycp: *mut PIXEL_YC, n: i32) -> BOOL>,
     pub avi_file_read_audio: Option<fn(afh: AVI_FILE_HANDLE, buf: *mut c_void, n: i32) -> i32>,
     pub avi_file_get_video_pixelp: Option<fn(afh: AVI_FILE_HANDLE, n: i32) -> *mut c_void>,
-    pub get_avi_file_filter: Option<fn(type_: i32) -> *mut u8>,
+    pub get_avi_file_filter: Option<fn(type_: i32) -> PSTR>,
     pub avi_file_read_audio_sample:
         Option<fn(afh: AVI_FILE_HANDLE, start: i32, length: i32, buf: *mut c_void) -> i32>,
     pub avi_file_set_audio_sample_rate:
@@ -275,13 +274,13 @@ pub struct EXFUNC {
     pub get_frame_status_table: Option<fn(editp: *mut c_void, type_: i32) -> *mut u8>,
     pub set_undo: Option<fn(editp: *mut c_void) -> BOOL>,
     pub add_menu_item: Option<
-        fn(fp: *mut c_void, name: *mut u8, hwnd: HWND, id: i32, def_key: i32, flag: i32) -> BOOL,
+        fn(fp: *mut c_void, name: PSTR, hwnd: HWND, id: i32, def_key: i32, flag: i32) -> BOOL,
     >,
-    pub edit_open: Option<fn(editp: *mut c_void, file: *mut u8, flag: i32) -> BOOL>,
+    pub edit_open: Option<fn(editp: *mut c_void, file: PSTR, flag: i32) -> BOOL>,
     pub edit_close: Option<fn(editp: *mut c_void) -> BOOL>,
     pub edit_output:
-        Option<fn(editp: *mut c_void, file: *mut u8, flag: i32, type_: *mut u8) -> BOOL>,
-    pub set_config: Option<fn(editp: *mut c_void, n: i32, name: *mut u8) -> BOOL>,
+        Option<fn(editp: *mut c_void, file: PSTR, flag: i32, type_: PSTR) -> BOOL>,
+    pub set_config: Option<fn(editp: *mut c_void, n: i32, name: PSTR) -> BOOL>,
     pub reserve: [i32; 7usize],
 }
 
@@ -290,14 +289,14 @@ pub struct FILTER {
     pub flag: i32,
     pub x: i32,
     pub y: i32,
-    pub name: *mut u8,
+    pub name: PSTR,
     pub track_n: i32,
-    pub track_name: *mut *mut u8,
+    pub track_name: *mut PSTR,
     pub track_default: *mut i32,
     pub track_s: *mut i32,
     pub track_e: *mut i32,
     pub check_n: i32,
-    pub check_name: *mut *mut u8,
+    pub check_name: *mut PSTR,
     pub check_default: *mut i32,
     pub func_proc: Option<fn(fp: *mut c_void, fpip: *mut FILTER_PROC_INFO) -> BOOL>,
     pub func_init: Option<fn(fp: *mut c_void) -> BOOL>,
@@ -317,7 +316,7 @@ pub struct FILTER {
     pub check: *mut i32,
     pub ex_data_ptr: *mut c_void,
     pub ex_data_size: i32,
-    pub information: *mut u8,
+    pub information: PSTR,
     pub func_save_start: Option<fn(fp: *mut c_void, s: i32, e: i32, editp: *mut c_void) -> BOOL>,
     pub func_save_end: Option<fn(fp: *mut c_void, editp: *mut c_void) -> BOOL>,
     pub exfunc: *mut EXFUNC,
@@ -340,9 +339,9 @@ pub struct FILTER {
     pub func_project_save:
         Option<fn(fp: *mut c_void, editp: *mut c_void, data: *mut c_void, size: *mut i32) -> BOOL>,
     pub func_modify_title: Option<
-        fn(fp: *mut c_void, editp: *mut c_void, frame: i32, title: *mut u8, max_title: i32) -> BOOL,
+        fn(fp: *mut c_void, editp: *mut c_void, frame: i32, title: PSTR, max_title: i32) -> BOOL,
     >,
-    pub dll_path: *mut u8,
+    pub dll_path: PSTR,
     pub reserve: [i32; 2usize],
 }
 
@@ -353,12 +352,12 @@ pub struct FILTER_DLL {
     pub y: i32,
     pub name: *const u8,
     pub track_n: i32,
-    pub track_name: *mut *mut u8,
+    pub track_name: *mut PSTR,
     pub track_default: *mut i32,
     pub track_s: *mut i32,
     pub track_e: *mut i32,
     pub check_n: i32,
-    pub check_name: *mut *mut u8,
+    pub check_name: *mut PSTR,
     pub check_default: *mut i32,
     pub func_proc: Option<fn(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL>,
     pub func_init: Option<fn(fp: *mut FILTER) -> BOOL>,
@@ -401,8 +400,8 @@ pub struct FILTER_DLL {
     pub func_project_save:
         Option<fn(fp: *mut FILTER, editp: *mut c_void, data: *mut c_void, size: *mut i32) -> BOOL>,
     pub func_modify_title: Option<
-        fn(fp: *mut FILTER, editp: *mut c_void, frame: i32, title: *mut u8, max_title: i32) -> BOOL,
+        fn(fp: *mut FILTER, editp: *mut c_void, frame: i32, title: PSTR, max_title: i32) -> BOOL,
     >,
-    pub dll_path: *mut u8,
+    pub dll_path: PSTR,
     pub reserve: [i32; 2usize],
 }
