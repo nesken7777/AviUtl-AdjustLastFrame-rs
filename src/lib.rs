@@ -49,10 +49,15 @@ static mut g_memref: CMemref = CMemref {
 
 fn adjustLastFrame(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
     unsafe {
+        // 現在編集中のシーンのインデックスを取得する。
         let scene = g_memref.Exedit_SceneDisplaying();
+
+        // 現在編集中のシーンの中で最も後ろにあるオブジェクト位置を取得する。
         let mut frameEndNumber = -1000;
         {
+            // オブジェクトの個数を取得する。
             let c = g_memref.Exedit_SortedObjectCount();
+            // オブジェクトテーブルを取得する。
             let objects = g_memref.Exedit_SortedObjectTable();
             for i in 0..c {
                 if scene != (*(*objects.add(i as usize))).scene_set {
@@ -60,7 +65,6 @@ fn adjustLastFrame(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
                 }
                 frameEndNumber =
                     yulib_generic::Max(frameEndNumber, (*(*objects.add(i as usize))).frame_end);
-                break;
             }
         }
 
