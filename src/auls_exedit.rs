@@ -90,17 +90,17 @@ impl TRACK_MODE {
 pub unsafe fn Exedit_GetWindow(fp: *mut FILTER) -> HWND {
     let exedit = Exedit_GetFilter(fp);
     if !exedit.is_null() {
-        (*exedit).hwnd as HWND
+        (*exedit).hwnd
     } else {
         0
     }
 }
 
 unsafe fn Exedit_GetFilter(fp: *mut FILTER) -> *mut FILTER {
-    let (exeditname_encode, _, err) = SHIFT_JIS.encode(EXEDIT_NAME);
-    if err {
+    let (exeditname_encode, _, _) = SHIFT_JIS.encode(EXEDIT_NAME);
+    /*if err {
         panic!("encode_error");
-    }
+    }*/
     let mut i = auls_aviutl::AviUtl_GetFilterNumber(fp);
     'whileloop: while i != 0 {
         i -= 1;
