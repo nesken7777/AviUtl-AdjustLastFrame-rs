@@ -6,7 +6,6 @@ use windows_sys::Win32::Foundation::*;
 use windows_sys::Win32::Storage::FileSystem::*;
 use windows_sys::Win32::System::SystemServices::*;
 
-#[repr(C)]
 pub struct CFile {
     pub file: HANDLE,
 }

@@ -5,7 +5,6 @@ use std::{ffi::c_void, mem::size_of, ptr::null_mut};
 use windows_sys::Win32::Foundation::BOOL;
 use windows_sys::Win32::System::Memory::*;
 
-#[repr(C)]
 pub struct CMemory<T> {
     pub mem: *mut T,
     pub size: usize,
@@ -34,9 +33,8 @@ impl<T> CMemory<T> {
             if self.mem.is_null() {
                 return false;
             }
-            eprintln!("Alloc is {:X}", size * size_of::<T>());
             self.size = size;
-            return true;
+            true
         } else {
             let temp =
                 MemReAlloc(self.mem as *mut c_void, size * size_of::<T>(), zeroinit) as *mut T;
@@ -45,7 +43,7 @@ impl<T> CMemory<T> {
             }
             self.mem = temp;
             self.size = size;
-            return true;
+            true
         }
     }
 }
@@ -68,5 +66,12 @@ unsafe fn MemReAlloc(mem: *mut c_void, size: usize, zeroinit: bool) -> *mut c_vo
 }
 
 fn Memfree(mem: *mut c_void) -> BOOL {
-    unsafe { HeapFree(GetProcessHeap(), 0, mem) }
+    unsafe {
+        let a = HeapFree(GetProcessHeap(), 0, mem);
+        if a != 0 {
+            true.into()
+        } else {
+            false.into()
+        }
+    }
 }

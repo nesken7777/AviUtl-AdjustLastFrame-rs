@@ -12,7 +12,6 @@ use windows_sys::Win32::UI::Shell::*;
 
 type PathType = [u8; 260usize];
 
-#[repr(C)]
 #[derive(Default, Copy, Clone)]
 pub struct CMemref {
     pub m_exedit: u64,
@@ -53,7 +52,7 @@ impl CMemref {
         self.m_exedit =
             LoadLibraryExA(b"exedit.auf\0".as_ptr(), 0, LOAD_WITH_ALTERED_SEARCH_PATH) as u64;
         if self.m_exedit == 0 {
-            return false as BOOL;
+            return false.into();
         }
         self.loadAddress(fp)
     }
@@ -78,7 +77,7 @@ impl CMemref {
             fileData.Alloc(filesize, true);
             let result = file.Read(fileData.mem as *mut c_void, filesize as u32);
             if result == 0 {
-                return false as BOOL;
+                return false.into();
             }
             let crc32 = yulib_generic::Crc32_2(fileData.mem as *mut c_void, filesize as u32);
             let temp = format!("{:08X}", crc32);
@@ -238,8 +237,7 @@ impl CMemref {
             appName.as_ptr(),
             b"Exedit_UndoInfo_buffer_size\0".as_ptr(),
         );
-        eprintln!("init_success");
-        true as BOOL
+        true.into()
     }
 
     unsafe fn getHex(path: *const u8, appName: *const u8, keyName: *const u8) -> u32 {
@@ -248,31 +246,27 @@ impl CMemref {
         let l = GetPrivateProfileStringA(
             appName,
             keyName,
-            b"".as_ptr(),
+            b"\0".as_ptr(),
             buffer.as_mut_ptr(),
             buffer.len() as u32,
             path,
         );
-        eprintln!("{}", std::str::from_utf8(&buffer[0..l as usize]).unwrap());
         let value = u32::from_str_radix(std::str::from_utf8(&buffer[0..l as usize]).unwrap(), 16);
         match value {
             Ok(some) => some,
-            Err(_) => panic!("ParseIntError"),
+            Err(_) => panic!(),
         }
     }
 
     pub unsafe fn Exedit_SceneDisplaying(&self) -> i32 {
-        println!("Exedit_SceneDisplaying");
         *((self.m_exedit + self.m_Exedit_SceneDisplaying as u64) as *mut i32)
     }
 
     pub unsafe fn Exedit_SortedObjectCount(&self) -> i32 {
-        println!("Exedit_SortedObjectCount");
         *((self.m_exedit + self.m_Exedit_SortedObjectCount as u64) as *mut i32)
     }
 
     pub unsafe fn Exedit_SortedObjectTable(&self) -> *mut *mut EXEDIT_OBJECT {
-        println!("Exedit_SortedObjectTable");
         (self.m_exedit + self.m_Exedit_SortedObjectTable as u64) as *mut *mut EXEDIT_OBJECT
     }
 }

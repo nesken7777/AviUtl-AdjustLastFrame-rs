@@ -5,14 +5,16 @@ use std::ptr::null_mut;
 
 use crate::auls_aviutl;
 use crate::filter::FILTER;
+use encoding_rs::SHIFT_JIS;
 use windows_sys::Win32::Foundation::*;
-const EXEDIT_NAME: *const u8 = "拡張編集".as_ptr();
+const EXEDIT_NAME: &str = "拡張編集\0";
 
 const MAX_FILTER: usize = 12;
 const MAX_TRACK: usize = 64;
 const MAX_CHECK: usize = 48;
 
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub struct EXEDIT_OBJECT {
     pub exists: u8,
     pub flag: u8,
@@ -41,7 +43,6 @@ pub struct EXEDIT_OBJECT {
 
 impl EXEDIT_OBJECT {
     pub fn GetFilterNum(&self) -> i32 {
-        println!("GetFilterNum");
         for i in 0..MAX_FILTER {
             if self.filter_param[i].id == FILTER_PARAM::INVALID_ID {
                 return i as i32;
@@ -50,12 +51,12 @@ impl EXEDIT_OBJECT {
         MAX_FILTER as i32
     }
     pub fn ExdataOffset(&self, idx: i32) -> u32 {
-        println!("ExdataOffset");
         self.exdata_offset + self.filter_param[idx as usize].exdata_offset
     }
 }
 
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub struct FILTER_PARAM {
     pub id: i32,
     pub track_begin: i16, // このフィルタの先頭のトラックバー番号
@@ -68,6 +69,7 @@ impl FILTER_PARAM {
 }
 
 #[repr(C)]
+#[derive(Clone, Copy)]
 pub struct TRACK_MODE {
     num: i16,
     script_num: i16,
@@ -85,27 +87,30 @@ impl TRACK_MODE {
     }
 }
 
-#[inline]
 pub unsafe fn Exedit_GetWindow(fp: *mut FILTER) -> HWND {
-    println!("Exedit_GetWindow");
     let exedit = Exedit_GetFilter(fp);
     if !exedit.is_null() {
-        (*exedit).hwnd as isize
+        (*exedit).hwnd as HWND
     } else {
-        null_mut::<HWND>() as HWND
+        0
     }
 }
 
-#[inline]
 unsafe fn Exedit_GetFilter(fp: *mut FILTER) -> *mut FILTER {
-    println!("Exedit_GetFilter");
-    let mut i = auls_aviutl::AviUtl_GetFilterNumber(fp);
-    while i != 0 {
-        i -= 1;
-        let exedit: *mut FILTER = (*(*fp).exfunc).get_filterp.unwrap()(i) as *mut FILTER;
-        if (*exedit).name == EXEDIT_NAME as *mut u8 {
-            return exedit;
-        }
+    let (exeditname_encode, _, err) = SHIFT_JIS.encode(EXEDIT_NAME);
+    if err {
+        panic!("encode_error");
     }
-    return null_mut();
+    let mut i = auls_aviutl::AviUtl_GetFilterNumber(fp);
+    'whileloop: while i != 0 {
+        i -= 1;
+        let exedit: *mut FILTER = ((*(*fp).exfunc).get_filterp.unwrap())(i) as *mut FILTER;
+        for c in 0..9 {
+            if *(*exedit).name.add(c) != *exeditname_encode.as_ptr().add(c) {
+                continue 'whileloop;
+            }
+        }
+        return exedit;
+    }
+    null_mut()
 }

@@ -47,38 +47,47 @@ static mut g_memref: CMemref = CMemref {
     m_Exedit_UndoInfo_buffer_size: 0,
 };
 
-unsafe fn adjustLastFrame(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
-    let scene = g_memref.Exedit_SceneDisplaying();
-    let mut frameEndNumber = -1000;
-    {
-        let c = g_memref.Exedit_SortedObjectCount();
-        let objects: *mut *mut auls_exedit::EXEDIT_OBJECT = g_memref.Exedit_SortedObjectTable();
-        for i in 0..c {
-            if scene != (*(*objects.add(i as usize))).scene_set {
-                continue;
+fn adjustLastFrame(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
+    unsafe {
+        let scene = g_memref.Exedit_SceneDisplaying();
+        let mut frameEndNumber = -1000;
+        {
+            let c = g_memref.Exedit_SortedObjectCount();
+            let objects = g_memref.Exedit_SortedObjectTable();
+            for i in 0..c {
+                if scene != (*(*objects.add(i as usize))).scene_set {
+                    continue;
+                }
+                frameEndNumber =
+                    yulib_generic::Max(frameEndNumber, (*(*objects.add(i as usize))).frame_end);
+                break;
             }
-            frameEndNumber =
-                yulib_generic::Max(frameEndNumber, (*(*objects.add(i as usize))).frame_end);
         }
-    }
 
-    let frameMaxNumber = (*(*fp).exfunc).get_frame_n.unwrap()((*fpip).editp);
-    if frameEndNumber <= 0 {
-        return false as BOOL;
+        let frameMaxNumber = {
+            let a = (*(*fp).exfunc).get_frame_n;
+            match a {
+                Some(f) => f,
+                None => panic!(),
+            }
+        }((*fpip).editp);
+        if frameEndNumber <= 0 {
+            return false.into();
+        }
+        if frameEndNumber + 1 >= frameMaxNumber {
+            return false.into();
+        }
+        let exeditWindow = auls_exedit::Exedit_GetWindow(fp);
+        if exeditWindow == 0 {
+            return false.into();
+        }
+        PostMessageA(exeditWindow, WM_COMMAND, 1097, 0);
+        true.into()
     }
-    if frameEndNumber + 1 >= frameMaxNumber {
-        return false as BOOL;
-    }
-    let exeditWindow = auls_exedit::Exedit_GetWindow(fp);
-    if exeditWindow == 0 {
-        return false as BOOL;
-    }
-    PostMessageA(exeditWindow, WM_COMMAND, 1097, 0);
-    true as BOOL
 }
 
 #[no_mangle]
-pub unsafe extern "stdcall" fn GetFilterTable() -> *mut FILTER_DLL {
+pub unsafe fn GetFilterTable() -> *mut FILTER_DLL {
     static mut g_Filter: FILTER_DLL = FILTER_DLL {
         flag: FILTER_FLAG_NO_CONFIG
             | FILTER_FLAG_ALWAYS_ACTIVE
@@ -86,8 +95,7 @@ pub unsafe extern "stdcall" fn GetFilterTable() -> *mut FILTER_DLL {
             | FILTER_FLAG_EX_INFORMATION,
         x: 0,
         y: 0,
-        //name: "最終フレーム自動調整\0".as_ptr(),
-        name: b"a\0".as_ptr(),
+        name: b"adjust\0".as_ptr(),
         track_n: 0,
         track_name: null_mut(),
         track_default: null_mut(),
@@ -105,8 +113,7 @@ pub unsafe extern "stdcall" fn GetFilterTable() -> *mut FILTER_DLL {
         check: null_mut(),
         ex_data_ptr: null_mut(),
         ex_data_size: 0,
-        //information: "最終フレーム自動調整 version 1.0.3 by 蛇色\r\nmodified nesken7777\0".as_ptr(),
-        information: b"a\0".as_ptr(),
+        information: b"adjust\0".as_ptr(),
         func_save_start: None,
         exfunc: null_mut(),
         hwnd: 0,
@@ -124,19 +131,16 @@ pub unsafe extern "stdcall" fn GetFilterTable() -> *mut FILTER_DLL {
 }
 
 //BOOL
-#[no_mangle]
-pub unsafe extern "stdcall" fn func_init(fp: *mut FILTER) -> BOOL {
-    eprintln!("func_init");
-    return g_memref.Init(fp); // auls::CMemref の初期化。
+fn func_init(fp: *mut FILTER) -> BOOL {
+    unsafe {
+        g_memref.Init(fp) // auls::CMemref の初期化。
+    }
 }
 
-#[no_mangle]
-pub unsafe extern "stdcall" fn func_exit(_fp: *mut FILTER) -> BOOL {
-    return false as BOOL;
+fn func_exit(_fp: *mut FILTER) -> BOOL {
+    false.into()
 }
 
-#[no_mangle]
-pub unsafe extern "stdcall" fn func_proc(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
-    eprintln!("func_proc");
-    return adjustLastFrame(fp, fpip);
+fn func_proc(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
+    adjustLastFrame(fp, fpip)
 }

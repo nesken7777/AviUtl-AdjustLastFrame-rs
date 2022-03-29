@@ -1,7 +1,6 @@
 #![allow(non_snake_case)]
 use std::ffi::c_void;
 
-#[inline]
 pub unsafe fn Crc32_3(data: *mut c_void, size: u32, table: *mut u32) -> u32 {
     let mut p = data as *mut u8;
     let end = p.add(size as usize);
@@ -10,17 +9,15 @@ pub unsafe fn Crc32_3(data: *mut c_void, size: u32, table: *mut u32) -> u32 {
         crc = (crc >> 8) ^ *table.add((crc as u8 ^ *p) as usize);
         p = p.add(1);
     }
-    return !crc;
+    !crc
 }
 
-#[inline]
 pub unsafe fn Crc32_2(data: *mut c_void, size: u32) -> u32 {
     let mut table: [u32; 256] = [0; 256];
     MakeCrc32Table(table.as_mut_ptr());
-    return Crc32_3(data, size, table.as_mut_ptr());
+    Crc32_3(data, size, table.as_mut_ptr())
 }
 
-#[inline]
 pub unsafe fn MakeCrc32Table(table: *mut u32) {
     const CRCPOLY: u32 = 0xEDB88320;
     for i in 0u32..256 {
@@ -37,7 +34,6 @@ pub unsafe fn MakeCrc32Table(table: *mut u32) {
 }
 
 pub fn Max<T: Ord>(a: T, b: T) -> T {
-    println!("Max");
     if a >= b {
         a
     } else {
