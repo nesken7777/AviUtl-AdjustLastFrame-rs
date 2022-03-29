@@ -91,7 +91,7 @@ fn adjustLastFrame(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
 }
 
 #[no_mangle]
-pub unsafe fn GetFilterTable() -> *mut FILTER_DLL {
+pub unsafe extern "system" fn GetFilterTable() -> *mut FILTER_DLL {
     static mut g_Filter: FILTER_DLL = FILTER_DLL {
         flag: FILTER_FLAG_NO_CONFIG
             | FILTER_FLAG_ALWAYS_ACTIVE
@@ -99,7 +99,7 @@ pub unsafe fn GetFilterTable() -> *mut FILTER_DLL {
             | FILTER_FLAG_EX_INFORMATION,
         x: 0,
         y: 0,
-        name: b"adjust\0".as_ptr(),
+        name: b"AdjustLastFrame-rs\0".as_ptr(),
         track_n: 0,
         track_name: null_mut(),
         track_default: null_mut(),
@@ -117,7 +117,7 @@ pub unsafe fn GetFilterTable() -> *mut FILTER_DLL {
         check: null_mut(),
         ex_data_ptr: null_mut(),
         ex_data_size: 0,
-        information: b"adjust\0".as_ptr(),
+        information: b"AdjustLastFrame-rs v1.0.0(rewrited by nesken7777)\0".as_ptr(),
         func_save_start: None,
         exfunc: null_mut(),
         hwnd: 0,
