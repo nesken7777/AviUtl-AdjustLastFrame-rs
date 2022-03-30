@@ -1,5 +1,11 @@
 # 謝辞
 
+## [AviUtl Plugin SDK  for ver0.99m  by ＫＥＮくん](http://spring-fragrance.mints.ne.jp/aviutl)
+
+### Copyright (c) 1999-2012 Kenkun
+
+## [yulib/aulslib](https://auls.client.jp)
+
 ## [AviUtl プラグイン - 最終フレーム自動調整 version 1.0.3 by 蛇色](https://github.com/hebiiro/AviUtl-Plugin-AdjustLastFrame)
 
 ### Copyright (c) 2021 hebiiro
