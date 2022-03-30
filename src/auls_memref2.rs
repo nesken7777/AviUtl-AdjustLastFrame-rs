@@ -4,7 +4,7 @@ use crate::filter::*;
 use crate::yulib_file;
 use crate::yulib_generic;
 use crate::yulib_memory;
-use std::ffi::c_void;
+use core::ffi::c_void;
 use windows_sys::Win32::Foundation::*;
 use windows_sys::Win32::System::LibraryLoader::*;
 use windows_sys::Win32::System::WindowsProgramming::GetPrivateProfileStringA;
@@ -80,9 +80,11 @@ impl CMemref {
                 return false.into();
             }
             let crc32 = yulib_generic::Crc32_2(fileData.mem as *mut c_void, filesize as u32);
-            let temp = format!("{:08X}", crc32);
+            let crc32ptr = &crc32 as *const u32 as *const i8;
+            let mut temp: [u8; 9] = [0; 9];
+            wvnsprintfA(temp.as_mut_ptr(), 9, "%08X".as_ptr(), crc32ptr);
             for i in 0..temp.len() {
-                appName[i] = temp.as_bytes()[i];
+                appName[i] = *temp.as_ptr().add(i);
             }
         }
         self.m_Exedit_StaticFilterTable = Self::getHex(
@@ -251,7 +253,7 @@ impl CMemref {
             buffer.len() as u32,
             path,
         );
-        let value = u32::from_str_radix(std::str::from_utf8(&buffer[0..l as usize]).unwrap(), 16);
+        let value = u32::from_str_radix(core::str::from_utf8(&buffer[0..l as usize]).unwrap(), 16);
         match value {
             Ok(some) => some,
             Err(_) => panic!(),

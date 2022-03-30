@@ -1,5 +1,5 @@
 use crate::filter::*;
-use std::ptr::null_mut;
+use core::ptr::null_mut;
 
 pub unsafe fn AviUtl_GetFilterNumber(fp: *mut FILTER) -> i32 {
     let mut si: SYS_INFO = SYS_INFO::default();

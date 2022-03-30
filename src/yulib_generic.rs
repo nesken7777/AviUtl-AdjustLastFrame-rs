@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-use std::ffi::c_void;
+use core::ffi::c_void;
 
 pub unsafe fn Crc32_3(data: *const c_void, size: u32, table: *mut u32) -> u32 {
     let mut p = data as *const u8;

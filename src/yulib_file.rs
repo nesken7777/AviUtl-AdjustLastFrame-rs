@@ -1,6 +1,6 @@
-use std::ffi::c_void;
-use std::ptr::null;
-use std::ptr::null_mut;
+use core::ffi::c_void;
+use core::ptr::null;
+use core::ptr::null_mut;
 use windows_sys::core::*;
 use windows_sys::Win32::Foundation::*;
 use windows_sys::Win32::Storage::FileSystem::*;

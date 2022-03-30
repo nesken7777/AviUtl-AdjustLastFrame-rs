@@ -1,8 +1,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
-use std::ffi::c_void;
-use std::ptr::null_mut;
+use core::ffi::c_void;
+use core::ptr::null_mut;
 use windows_sys::core::*;
 use windows_sys::Win32::Foundation::*;
 use windows_sys::Win32::Graphics::Gdi::HFONT;

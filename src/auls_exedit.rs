@@ -1,7 +1,7 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(dead_code)]
-use std::ptr::null_mut;
+use core::ptr::null_mut;
 
 use crate::auls_aviutl;
 use crate::filter::FILTER;

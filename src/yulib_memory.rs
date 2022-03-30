@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use std::{ffi::c_void, mem::size_of, ptr::null_mut};
+use core::{ffi::c_void, mem::size_of, ptr::null_mut};
 
 use windows_sys::Win32::Foundation::BOOL;
 use windows_sys::Win32::System::Memory::*;
