@@ -10,7 +10,8 @@ pub mod yulib_memory;
 use crate::filter::*;
 use auls_memref2::CMemref;
 use core::ptr::null_mut;
-use windows::core::{Error, PSTR};
+use std::ptr::NonNull;
+use windows::core::{s, Error, PSTR};
 use windows::Win32::Foundation::{BOOL, HINSTANCE, HMODULE, HWND, LPARAM, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
 
@@ -48,7 +49,7 @@ static mut g_memref: CMemref = CMemref {
     m_Exedit_UndoInfo_buffer_size: 0,
 };
 
-fn adjustLastFrame(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> Result<(), Error> {
+fn adjustLastFrame(fp: &FILTER, fpip: &FILTER_PROC_INFO) -> Result<(), Error> {
     unsafe {
         // 現在編集中のシーンのインデックスを取得する。
         let scene = g_memref.Exedit_SceneDisplaying();
@@ -69,13 +70,7 @@ fn adjustLastFrame(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> Result<(), E
             }
         }
 
-        let frameMaxNumber = {
-            let a = (*(*fp).exfunc).get_frame_n;
-            match a {
-                Some(f) => f,
-                None => panic!(),
-            }
-        }((*fpip).editp);
+        let frameMaxNumber = ((*fp).exfunc.unwrap().as_ref().get_frame_n.unwrap())((*fpip).editp);
         if frameEndNumber <= 0 {
             return Err(Error::OK);
         }
@@ -100,30 +95,30 @@ pub unsafe extern "system" fn GetFilterTable() -> *mut FILTER_DLL {
             | FILTER_FLAG_EX_INFORMATION,
         x: 0,
         y: 0,
-        name: b"AdjustLastFrame-rs\0".as_ptr(),
+        name: s!("AdjustLastFrame-rs"),
         track_n: 0,
-        track_name: null_mut(),
-        track_default: null_mut(),
-        track_s: null_mut(),
-        track_e: null_mut(),
+        track_name: None,
+        track_default: None,
+        track_s: None,
+        track_e: None,
         check_n: 0,
-        check_name: null_mut(),
-        check_default: null_mut(),
+        check_name: None,
+        check_default: None,
         func_proc: Some(func_proc),
         func_init: Some(func_init),
         func_exit: Some(func_exit),
         func_update: None,
         func_WndProc: None,
-        track: null_mut(),
-        check: null_mut(),
-        ex_data_ptr: null_mut(),
+        track: None,
+        check: None,
+        ex_data_ptr: None,
         ex_data_size: 0,
-        information: b"AdjustLastFrame-rs v1.0.0(rewrited by nesken7777)\0".as_ptr(),
+        information: s!("AdjustLastFrame-rs v1.0.0(rewrited by nesken7777)"),
         func_save_start: None,
-        exfunc: null_mut(),
+        exfunc: None,
         hwnd: HWND(0),
         dll_hinst: HINSTANCE(0),
-        ex_data_def: null_mut(),
+        ex_data_def: None,
         func_is_saveframe: None,
         func_modify_title: None,
         func_project_load: None,
@@ -136,18 +131,26 @@ pub unsafe extern "system" fn GetFilterTable() -> *mut FILTER_DLL {
 }
 
 //BOOL
-fn func_init(fp: *mut FILTER) -> BOOL {
+fn func_init(fp: Option<NonNull<FILTER>>) -> BOOL {
     unsafe {
+        let Some(fp) = fp.map(|x| x.as_ref()) else {
+            return false.into();
+        };
         g_memref
             .Init(fp)
             .map_or_else(|_| false.into(), |_| true.into()) // auls::CMemref の初期化。
     }
 }
 
-fn func_exit(_fp: *mut FILTER) -> BOOL {
+fn func_exit(_fp: Option<NonNull<FILTER>>) -> BOOL {
     false.into()
 }
 
-fn func_proc(fp: *mut FILTER, fpip: *mut FILTER_PROC_INFO) -> BOOL {
-    adjustLastFrame(fp, fpip).map_or_else(|_| false.into(), |_| true.into())
+fn func_proc(fp: Option<NonNull<FILTER>>, fpip: Option<NonNull<FILTER_PROC_INFO>>) -> BOOL {
+    unsafe {
+        let (Some(fp), Some(fpip)) = (fp.map(|x| x.as_ref()), fpip.map(|x| x.as_ref())) else {
+            return false.into();
+        };
+        adjustLastFrame(fp, fpip).map_or_else(|_| false.into(), |_| true.into())
+    }
 }

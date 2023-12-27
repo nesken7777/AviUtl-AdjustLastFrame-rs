@@ -1,13 +1,12 @@
 #![allow(non_camel_case_types)]
 #![allow(non_snake_case)]
 #![allow(dead_code)]
-use core::ptr::null_mut;
-
-use windows::Win32::Foundation::HWND;
 
 use crate::auls_aviutl;
 use crate::filter::FILTER;
-const EXEDIT_NAME: [u8;9] = [138, 103, 146, 163, 149, 210, 143, 87, 0]; //"拡張編集\0"って書いてあります！
+use core::slice;
+use windows::Win32::Foundation::HWND;
+const EXEDIT_NAME: [u8; 9] = [138, 103, 146, 163, 149, 210, 143, 87, 0]; //"拡張編集\0"って書いてあります！
 
 const MAX_FILTER: usize = 12;
 const MAX_TRACK: usize = 64;
@@ -87,26 +86,28 @@ impl TRACK_MODE {
     }
 }
 
-pub unsafe fn Exedit_GetWindow(fp: *mut FILTER) -> HWND {
+pub unsafe fn Exedit_GetWindow(fp: &FILTER) -> HWND {
     let exedit = Exedit_GetFilter(fp);
-    if !exedit.is_null() {
-        (*exedit).hwnd
-    } else {
-        HWND(0)
-    }
+    exedit.map_or(HWND(0), |exedit| exedit.hwnd)
 }
 
-unsafe fn Exedit_GetFilter(fp: *mut FILTER) -> *mut FILTER {
-    let mut i = auls_aviutl::AviUtl_GetFilterNumber(fp);
-    'whileloop: while i != 0 {
-        i -= 1;
-        let exedit: *mut FILTER = ((*(*fp).exfunc).get_filterp.unwrap())(i) as *mut FILTER;
-        for c in 0..9 {
-            if *(*exedit).name.0.add(c) != *EXEDIT_NAME.as_ptr().add(c) {
-                continue 'whileloop;
+unsafe fn Exedit_GetFilter(fp: &FILTER) -> Option<&FILTER> {
+    let i = auls_aviutl::AviUtl_GetFilterNumber(fp);
+    fn exedit_getfilter_internal(fp: &FILTER, number: i32) -> Option<&FILTER> {
+        if number == 0 {
+            return None;
+        }
+        unsafe {
+            let exedit = fp.exfunc.unwrap().as_ref().get_filterp.unwrap()(number)
+                .map(|x| x.cast::<FILTER>().as_ref())
+                .unwrap();
+
+            if slice::from_raw_parts(exedit.name.0, 9) == &EXEDIT_NAME[..] {
+                Some(exedit)
+            } else {
+                exedit_getfilter_internal(fp, number - 1)
             }
         }
-        return exedit;
     }
-    null_mut()
+    exedit_getfilter_internal(fp, i - 1)
 }

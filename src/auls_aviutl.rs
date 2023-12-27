@@ -1,8 +1,8 @@
 use crate::filter::*;
-use core::ptr::null_mut;
+use std::ptr::NonNull;
 
-pub unsafe fn AviUtl_GetFilterNumber(fp: *mut FILTER) -> i32 {
+pub unsafe fn AviUtl_GetFilterNumber(fp: &FILTER) -> i32 {
     let mut si: SYS_INFO = SYS_INFO::default();
-    ((*(*fp).exfunc).get_sys_info.unwrap())(null_mut(), &mut si);
+    ((*fp).exfunc.unwrap().as_ref().get_sys_info.unwrap())(None, NonNull::new(&mut si));
     si.filter_n
 }
