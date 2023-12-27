@@ -5,16 +5,25 @@ use crate::yulib_file;
 use crate::yulib_generic;
 use crate::yulib_memory;
 use core::ffi::c_void;
-use windows_sys::Win32::Foundation::*;
-use windows_sys::Win32::System::LibraryLoader::*;
-use windows_sys::Win32::System::WindowsProgramming::GetPrivateProfileStringA;
-use windows_sys::Win32::UI::Shell::*;
+use core::slice;
+use windows::core::Error;
+use windows::core::{PCSTR, PSTR};
+use windows::Win32::Foundation::HANDLE;
+use windows::Win32::Foundation::HMODULE;
+use windows::Win32::Foundation::MAX_PATH;
+use windows::Win32::System::LibraryLoader::GetModuleFileNameA;
+use windows::Win32::System::LibraryLoader::LoadLibraryExA;
+use windows::Win32::System::LibraryLoader::LOAD_WITH_ALTERED_SEARCH_PATH;
+use windows::Win32::System::WindowsProgramming::GetPrivateProfileStringA;
+use windows::Win32::UI::Shell::wvnsprintfA;
+use windows::Win32::UI::Shell::PathAppendA;
+use windows::Win32::UI::Shell::PathRemoveFileSpecA;
 
 type PathType = [u8; 260usize];
 
 #[derive(Default, Copy, Clone)]
 pub struct CMemref {
-    pub m_exedit: u64,
+    pub m_exedit: HMODULE,
     pub m_Exedit_StaticFilterTable: u32,
     pub m_Exedit_SortedObjectTable_LayerIndexEnd: u32,
     pub m_Exedit_AliasNameBuffer: u32,
@@ -48,41 +57,38 @@ pub struct CMemref {
 }
 
 impl CMemref {
-    pub unsafe fn Init(&mut self, fp: *mut FILTER) -> BOOL {
-        self.m_exedit =
-            LoadLibraryExA(b"exedit.auf\0".as_ptr(), 0, LOAD_WITH_ALTERED_SEARCH_PATH) as u64;
-        if self.m_exedit == 0 {
-            return false.into();
-        }
+    pub unsafe fn Init(&mut self, fp: *mut FILTER) -> Result<(), Error> {
+        let handle = LoadLibraryExA(
+            PCSTR(b"exedit.auf\0".as_ptr()),
+            HANDLE(0),
+            LOAD_WITH_ALTERED_SEARCH_PATH,
+        )?;
+        self.m_exedit = handle;
         self.loadAddress(fp)
     }
 
-    unsafe fn loadAddress(&mut self, fp: *mut FILTER) -> BOOL {
+    unsafe fn loadAddress(&mut self, fp: *mut FILTER) -> Result<(), Error> {
         let mut iniFilePath: PathType = [b'\0'; MAX_PATH as usize];
-        GetModuleFileNameA(
-            (*fp).dll_hinst as isize,
-            iniFilePath.as_mut_ptr(),
-            iniFilePath.len() as u32,
-        );
-        PathRemoveFileSpecA(iniFilePath.as_mut_ptr());
-        PathAppendA(iniFilePath.as_mut_ptr(), b"auls_memref.ini\0".as_ptr());
+        GetModuleFileNameA((*fp).dll_hinst, iniFilePath.as_mut_slice());
+        PathRemoveFileSpecA(PSTR(iniFilePath.as_mut_ptr()));
+        PathAppendA(&mut iniFilePath, PCSTR(b"auls_memref.ini\0".as_ptr()));
         let mut appName: PathType = [b'\0'; MAX_PATH as usize];
         {
             let mut path: PathType = [b'\0'; MAX_PATH as usize];
-            GetModuleFileNameA(self.m_exedit as isize, path.as_mut_ptr(), path.len() as u32);
+            GetModuleFileNameA(self.m_exedit, path.as_mut_slice());
             let mut file = yulib_file::CFile::default();
-            file.OpenExisting(path.as_ptr());
+            file.OpenExisting(PCSTR(path.as_ptr()))?;
             let filesize = file.Size() as usize;
             let mut fileData = yulib_memory::CMemory::<u8>::default();
-            fileData.Alloc(filesize, true);
-            let result = file.Read(fileData.mem as *mut c_void, filesize as u32);
-            if result == 0 {
-                return false.into();
-            }
+            fileData.Alloc(filesize, true)?;
+            file.Read(
+                slice::from_raw_parts_mut(fileData.mem, fileData.size),
+                filesize as u32,
+            )?;
             let crc32 = yulib_generic::Crc32_2(fileData.mem as *mut c_void, filesize as u32);
             let crc32ptr = &crc32 as *const u32 as *const i8;
             let mut temp: [u8; 9] = [0; 9];
-            wvnsprintfA(temp.as_mut_ptr(), 9, "%08X".as_ptr(), crc32ptr);
+            wvnsprintfA(temp.as_mut_slice(), PCSTR("%08X".as_ptr()), crc32ptr);
             for i in 0..temp.len() {
                 appName[i] = *temp.as_ptr().add(i);
             }
@@ -239,19 +245,18 @@ impl CMemref {
             appName.as_ptr(),
             b"Exedit_UndoInfo_buffer_size\0".as_ptr(),
         );
-        true.into()
+        Ok(())
     }
 
     unsafe fn getHex(path: *const u8, appName: *const u8, keyName: *const u8) -> u32 {
         let mut buffer: PathType = [b'\0'; MAX_PATH as usize];
 
         let l = GetPrivateProfileStringA(
-            appName,
-            keyName,
-            b"\0".as_ptr(),
-            buffer.as_mut_ptr(),
-            buffer.len() as u32,
-            path,
+            PCSTR(appName),
+            PCSTR(keyName),
+            PCSTR(b"\0".as_ptr()),
+            Some(buffer.as_mut_slice()),
+            PCSTR(path),
         );
         let value = u32::from_str_radix(core::str::from_utf8(&buffer[0..l as usize]).unwrap(), 16);
         match value {
@@ -261,14 +266,14 @@ impl CMemref {
     }
 
     pub unsafe fn Exedit_SceneDisplaying(&self) -> i32 {
-        *((self.m_exedit + self.m_Exedit_SceneDisplaying as u64) as *mut i32)
+        *((self.m_exedit.0 + self.m_Exedit_SceneDisplaying as isize) as *mut i32)
     }
 
     pub unsafe fn Exedit_SortedObjectCount(&self) -> i32 {
-        *((self.m_exedit + self.m_Exedit_SortedObjectCount as u64) as *mut i32)
+        *((self.m_exedit.0 + self.m_Exedit_SortedObjectCount as isize) as *mut i32)
     }
 
     pub unsafe fn Exedit_SortedObjectTable(&self) -> *mut *mut EXEDIT_OBJECT {
-        (self.m_exedit + self.m_Exedit_SortedObjectTable as u64) as *mut *mut EXEDIT_OBJECT
+        (self.m_exedit.0 + self.m_Exedit_SortedObjectTable as isize) as *mut *mut EXEDIT_OBJECT
     }
 }

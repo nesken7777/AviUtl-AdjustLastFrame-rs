@@ -2,11 +2,9 @@
 #![allow(non_camel_case_types)]
 
 use core::ffi::c_void;
-use core::ptr::null_mut;
-use windows_sys::core::*;
-use windows_sys::Win32::Foundation::*;
-use windows_sys::Win32::Graphics::Gdi::HFONT;
-
+use windows::Win32::Foundation::{BOOL, HWND, WPARAM, LPARAM, HINSTANCE};
+use windows::Win32::Graphics::Gdi::HFONT;
+use windows::core::PSTR;
 
 pub const FILTER_FLAG_NO_CONFIG: i32 = 0x100000;
 pub const FILTER_FLAG_ALWAYS_ACTIVE: i32 = 0x4;
@@ -43,21 +41,21 @@ impl Default for SYS_INFO {
     fn default() -> Self {
         SYS_INFO {
             flag: 0,
-            info: null_mut(),
+            info: PSTR::null(),
             filter_n: 0,
             min_w: 0,
             min_h: 0,
             max_w: 0,
             max_h: 0,
             max_frame: 0,
-            edit_name: null_mut(),
-            project_name: null_mut(),
-            output_name: null_mut(),
+            edit_name: PSTR::null(),
+            project_name: PSTR::null(),
+            output_name: PSTR::null(),
             vram_w: 0,
             vram_h: 0,
             vram_yc_size: 0,
             vram_line_size: 0,
-            hfont: 0,
+            hfont: HFONT::default(),
             build: 0,
             reserve: [0; 2],
         }

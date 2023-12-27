@@ -2,8 +2,12 @@
 
 use core::{ffi::c_void, mem::size_of, ptr::null_mut};
 
-use windows_sys::Win32::Foundation::BOOL;
-use windows_sys::Win32::System::Memory::*;
+use windows::{
+    core::Error,
+    Win32::System::Memory::{
+        GetProcessHeap, HeapAlloc, HeapFree, HeapReAlloc, HEAP_FLAGS, HEAP_ZERO_MEMORY,
+    },
+};
 
 pub struct CMemory<T> {
     pub mem: *mut T,
@@ -21,57 +25,55 @@ impl<T> Default for CMemory<T> {
 impl<T> Drop for CMemory<T> {
     fn drop(&mut self) {
         if !self.mem.is_null() {
-            Memfree(self.mem as *mut c_void);
+            let _ = Memfree(self.mem as *mut c_void);
         }
     }
 }
 
 impl<T> CMemory<T> {
-    pub unsafe fn Alloc(&mut self, size: usize, zeroinit: bool) -> bool {
+    pub unsafe fn Alloc(&mut self, size: usize, zeroinit: bool) -> Result<(), Error> {
         if self.mem.is_null() {
-            self.mem = MemAlloc(size * size_of::<T>(), zeroinit) as *mut T;
-            if self.mem.is_null() {
-                return false;
-            }
+            self.mem = MemAlloc(size * size_of::<T>(), zeroinit)? as *mut T;
             self.size = size;
-            true
+            Ok(())
         } else {
             let temp =
-                MemReAlloc(self.mem as *mut c_void, size * size_of::<T>(), zeroinit) as *mut T;
-            if temp.is_null() {
-                return false;
-            }
+                MemReAlloc(self.mem as *mut c_void, size * size_of::<T>(), zeroinit)? as *mut T;
             self.mem = temp;
             self.size = size;
-            true
+            Ok(())
         }
     }
 }
 
-unsafe fn MemAlloc(size: usize, zeroinit: bool) -> *mut c_void {
-    HeapAlloc(
-        GetProcessHeap(),
-        if zeroinit { HEAP_ZERO_MEMORY } else { 0 },
-        size,
-    )
-}
-
-unsafe fn MemReAlloc(mem: *mut c_void, size: usize, zeroinit: bool) -> *mut c_void {
-    HeapReAlloc(
-        GetProcessHeap(),
-        if zeroinit { HEAP_ZERO_MEMORY } else { 0 },
-        mem,
-        size,
-    )
-}
-
-fn Memfree(mem: *mut c_void) -> BOOL {
-    unsafe {
-        let a = HeapFree(GetProcessHeap(), 0, mem);
-        if a != 0 {
-            true.into()
+unsafe fn MemAlloc(size: usize, zeroinit: bool) -> Result<*mut c_void, Error> {
+    Ok(HeapAlloc(
+        GetProcessHeap()?,
+        if zeroinit {
+            HEAP_ZERO_MEMORY
         } else {
-            false.into()
-        }
+            HEAP_FLAGS(0)
+        },
+        size,
+    ))
+}
+
+unsafe fn MemReAlloc(mem: *mut c_void, size: usize, zeroinit: bool) -> Result<*mut c_void, Error> {
+    Ok(HeapReAlloc(
+        GetProcessHeap()?,
+        if zeroinit {
+            HEAP_ZERO_MEMORY
+        } else {
+            HEAP_FLAGS(0)
+        },
+        Some(mem),
+        size,
+    ))
+}
+
+fn Memfree(mem: *mut c_void) -> Result<(), Error> {
+    unsafe {
+        let process_heap = GetProcessHeap()?;
+        HeapFree(process_heap, HEAP_FLAGS(0), Some(mem))
     }
 }

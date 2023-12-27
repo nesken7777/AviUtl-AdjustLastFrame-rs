@@ -1,11 +1,14 @@
-use core::ffi::c_void;
-use core::ptr::null;
-use core::ptr::null_mut;
-use windows_sys::core::*;
-use windows_sys::Win32::Foundation::*;
-use windows_sys::Win32::Storage::FileSystem::*;
-use windows_sys::Win32::System::SystemServices::*;
-
+use windows::core::Error;
+use windows::core::PCSTR;
+use windows::Win32::Foundation::CloseHandle;
+use windows::Win32::Foundation::GENERIC_READ;
+use windows::Win32::Foundation::HANDLE;
+use windows::Win32::Foundation::INVALID_HANDLE_VALUE;
+use windows::Win32::Storage::FileSystem::GetFileSize;
+use windows::Win32::Storage::FileSystem::FILE_ATTRIBUTE_NORMAL;
+use windows::Win32::Storage::FileSystem::FILE_SHARE_NONE;
+use windows::Win32::Storage::FileSystem::OPEN_EXISTING;
+use windows::Win32::Storage::FileSystem::{CreateFileA, ReadFile};
 pub struct CFile {
     pub file: HANDLE,
 }
@@ -21,46 +24,42 @@ impl Default for CFile {
 impl Drop for CFile {
     fn drop(&mut self) {
         unsafe {
-            if self.file != -1 && self.file != 0 {
-                CloseHandle(self.file);
+            if !self.file.is_invalid() {
+                let _ = CloseHandle(self.file);
             }
         }
     }
 }
 
 impl CFile {
-    pub unsafe fn OpenExisting(&mut self, filename: PCSTR) -> bool {
-        if !self.Close() {
-            return false;
-        }
+    pub unsafe fn OpenExisting(&mut self, filename: PCSTR) -> Result<(), Error> {
+        self.Close()?;
         self.file = CreateFileA(
             filename,
-            GENERIC_READ,
-            0,
-            null(),
+            GENERIC_READ.0,
+            FILE_SHARE_NONE,
+            None,
             OPEN_EXISTING,
             FILE_ATTRIBUTE_NORMAL,
-            0,
-        );
-        self.file != INVALID_HANDLE_VALUE
+            HANDLE(0),
+        )?;
+        Ok(())
     }
 
-    pub unsafe fn Close(&mut self) -> bool {
+    pub unsafe fn Close(&mut self) -> Result<(), Error> {
         if self.file == INVALID_HANDLE_VALUE {
-            return true;
+            return Ok(());
         }
-        if CloseHandle(self.file) == 0 {
-            return false;
-        }
+        CloseHandle(self.file)?;
         self.file = INVALID_HANDLE_VALUE;
-        true
+        Ok(())
     }
 
     pub unsafe fn Size(&self) -> u32 {
-        GetFileSize(self.file, null_mut())
+        GetFileSize(self.file, None)
     }
 
-    pub unsafe fn Read(&self, buf: *mut c_void, mut size: u32) -> BOOL {
-        ReadFile(self.file, buf, size, &mut size, null_mut())
+    pub unsafe fn Read(&self, buf: &mut [u8], mut size: u32) -> Result<(), Error> {
+        ReadFile(self.file, Some(buf), Some(&mut size), None)
     }
 }

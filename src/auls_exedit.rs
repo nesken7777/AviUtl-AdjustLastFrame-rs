@@ -3,11 +3,11 @@
 #![allow(dead_code)]
 use core::ptr::null_mut;
 
+use windows::Win32::Foundation::HWND;
+
 use crate::auls_aviutl;
 use crate::filter::FILTER;
-use encoding_rs::SHIFT_JIS;
-use windows_sys::Win32::Foundation::*;
-const EXEDIT_NAME: &str = "拡張編集\0";
+const EXEDIT_NAME: [u8;9] = [138, 103, 146, 163, 149, 210, 143, 87, 0]; //"拡張編集\0"って書いてあります！
 
 const MAX_FILTER: usize = 12;
 const MAX_TRACK: usize = 64;
@@ -92,21 +92,17 @@ pub unsafe fn Exedit_GetWindow(fp: *mut FILTER) -> HWND {
     if !exedit.is_null() {
         (*exedit).hwnd
     } else {
-        0
+        HWND(0)
     }
 }
 
 unsafe fn Exedit_GetFilter(fp: *mut FILTER) -> *mut FILTER {
-    let (exeditname_encode, _, _) = SHIFT_JIS.encode(EXEDIT_NAME);
-    /*if err {
-        panic!("encode_error");
-    }*/
     let mut i = auls_aviutl::AviUtl_GetFilterNumber(fp);
     'whileloop: while i != 0 {
         i -= 1;
         let exedit: *mut FILTER = ((*(*fp).exfunc).get_filterp.unwrap())(i) as *mut FILTER;
         for c in 0..9 {
-            if *(*exedit).name.add(c) != *exeditname_encode.as_ptr().add(c) {
+            if *(*exedit).name.0.add(c) != *EXEDIT_NAME.as_ptr().add(c) {
                 continue 'whileloop;
             }
         }
