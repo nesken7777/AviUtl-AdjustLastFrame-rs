@@ -5,7 +5,7 @@ use core::{ffi::c_void, mem::size_of, ptr::null_mut};
 use windows::{
     core::Error,
     Win32::System::Memory::{
-        GetProcessHeap, HeapAlloc, HeapFree, HeapReAlloc, HEAP_FLAGS, HEAP_ZERO_MEMORY,
+        GetProcessHeap, HeapAlloc, HeapFree, HeapReAlloc, HEAP_NONE, HEAP_ZERO_MEMORY,
     },
 };
 
@@ -49,11 +49,7 @@ impl<T> CMemory<T> {
 unsafe fn MemAlloc(size: usize, zeroinit: bool) -> Result<*mut c_void, Error> {
     Ok(HeapAlloc(
         GetProcessHeap()?,
-        if zeroinit {
-            HEAP_ZERO_MEMORY
-        } else {
-            HEAP_FLAGS(0)
-        },
+        zeroinit.then_some(HEAP_ZERO_MEMORY).unwrap_or(HEAP_NONE),
         size,
     ))
 }
@@ -61,11 +57,7 @@ unsafe fn MemAlloc(size: usize, zeroinit: bool) -> Result<*mut c_void, Error> {
 unsafe fn MemReAlloc(mem: *mut c_void, size: usize, zeroinit: bool) -> Result<*mut c_void, Error> {
     Ok(HeapReAlloc(
         GetProcessHeap()?,
-        if zeroinit {
-            HEAP_ZERO_MEMORY
-        } else {
-            HEAP_FLAGS(0)
-        },
+        zeroinit.then_some(HEAP_ZERO_MEMORY).unwrap_or(HEAP_NONE),
         Some(mem),
         size,
     ))
@@ -74,6 +66,6 @@ unsafe fn MemReAlloc(mem: *mut c_void, size: usize, zeroinit: bool) -> Result<*m
 fn Memfree(mem: *mut c_void) -> Result<(), Error> {
     unsafe {
         let process_heap = GetProcessHeap()?;
-        HeapFree(process_heap, HEAP_FLAGS(0), Some(mem))
+        HeapFree(process_heap, HEAP_NONE, Some(mem))
     }
 }
