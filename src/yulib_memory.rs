@@ -1,6 +1,6 @@
 #![allow(non_snake_case)]
 
-use core::{ffi::c_void, mem::size_of, ptr::null_mut};
+use std::{ffi::c_void, mem::size_of, ptr::null_mut};
 
 use windows::{
     core::Error,

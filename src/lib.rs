@@ -9,7 +9,7 @@ pub mod yulib_generic;
 pub mod yulib_memory;
 use crate::filter::*;
 use auls_memref2::CMemref;
-use core::ptr::null_mut;
+use std::ptr::null_mut;
 use std::num::ParseIntError;
 use std::ptr::NonNull;
 use std::str::Utf8Error;

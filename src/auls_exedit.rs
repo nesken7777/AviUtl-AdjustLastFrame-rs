@@ -4,7 +4,7 @@
 
 use crate::auls_aviutl;
 use crate::filter::FILTER;
-use core::slice;
+use std::slice;
 use windows::Win32::Foundation::HWND;
 const EXEDIT_NAME: [u8; 9] = [138, 103, 146, 163, 149, 210, 143, 87, 0]; //"拡張編集\0"って書いてあります！
 

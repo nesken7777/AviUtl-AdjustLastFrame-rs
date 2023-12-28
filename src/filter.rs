@@ -1,8 +1,8 @@
 #![allow(non_snake_case)]
 #![allow(non_camel_case_types)]
 
-use core::ffi::c_void;
-use core::ptr::NonNull;
+use std::ffi::c_void;
+use std::ptr::NonNull;
 use windows::core::{PCSTR, PSTR};
 use windows::Win32::Foundation::{BOOL, HINSTANCE, HWND, LPARAM, WPARAM};
 use windows::Win32::Graphics::Gdi::HFONT;

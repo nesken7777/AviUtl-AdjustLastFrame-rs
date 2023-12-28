@@ -5,7 +5,7 @@ use crate::yulib_file;
 use crate::yulib_generic;
 use crate::yulib_memory;
 use crate::Errors;
-use core::slice;
+use std::slice;
 use windows::core::s;
 use windows::core::{PCSTR, PSTR};
 use windows::Win32::Foundation::HANDLE;
