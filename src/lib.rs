@@ -10,10 +10,35 @@ pub mod yulib_memory;
 use crate::filter::*;
 use auls_memref2::CMemref;
 use core::ptr::null_mut;
+use std::num::ParseIntError;
 use std::ptr::NonNull;
+use std::str::Utf8Error;
 use windows::core::{s, Error, PSTR};
 use windows::Win32::Foundation::{BOOL, HINSTANCE, HMODULE, HWND, LPARAM, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
+pub enum Errors {
+    WinApi(Error),
+    ParseInt(ParseIntError),
+    Utf8(Utf8Error),
+}
+
+impl From<Error> for Errors {
+    fn from(value: Error) -> Self {
+        Self::WinApi(value)
+    }
+}
+
+impl From<ParseIntError> for Errors {
+    fn from(value: ParseIntError) -> Self {
+        Self::ParseInt(value)
+    }
+}
+
+impl From<Utf8Error> for Errors {
+    fn from(value: Utf8Error) -> Self {
+        Self::Utf8(value)
+    }
+}
 
 static mut g_memref: CMemref = CMemref {
     m_exedit: HMODULE(0),
@@ -49,7 +74,7 @@ static mut g_memref: CMemref = CMemref {
     m_Exedit_UndoInfo_buffer_size: 0,
 };
 
-fn adjustLastFrame(fp: &FILTER, fpip: &FILTER_PROC_INFO) -> Result<(), Error> {
+fn adjustLastFrame(fp: &FILTER, fpip: &FILTER_PROC_INFO) -> Option<()> {
     unsafe {
         // 現在編集中のシーンのインデックスを取得する。
         let scene = g_memref.Exedit_SceneDisplaying();
@@ -70,19 +95,19 @@ fn adjustLastFrame(fp: &FILTER, fpip: &FILTER_PROC_INFO) -> Result<(), Error> {
             }
         }
 
-        let frameMaxNumber = ((*fp).exfunc.unwrap().as_ref().get_frame_n.unwrap())((*fpip).editp);
+        let frameMaxNumber = ((*fp).exfunc?.as_ref().get_frame_n?)((*fpip).editp);
         if frameEndNumber <= 0 {
-            return Err(Error::OK);
+            return None;
         }
         if frameEndNumber + 1 >= frameMaxNumber {
-            return Err(Error::OK);
+            return None;
         }
         let exeditWindow = auls_exedit::Exedit_GetWindow(fp);
         if exeditWindow == HWND(0) {
-            return Err(Error::OK);
+            return None;
         }
-        PostMessageA(exeditWindow, WM_COMMAND, WPARAM(1097), LPARAM(0))?;
-        Ok(())
+        PostMessageA(exeditWindow, WM_COMMAND, WPARAM(1097), LPARAM(0)).ok()?;
+        Some(())
     }
 }
 
@@ -151,6 +176,6 @@ fn func_proc(fp: Option<NonNull<FILTER>>, fpip: Option<NonNull<FILTER_PROC_INFO>
         let (Some(fp), Some(fpip)) = (fp.map(|x| x.as_ref()), fpip.map(|x| x.as_ref())) else {
             return false.into();
         };
-        adjustLastFrame(fp, fpip).map_or_else(|_| false.into(), |_| true.into())
+        adjustLastFrame(fp, fpip).map_or_else(|| false.into(), |_| true.into())
     }
 }

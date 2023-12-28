@@ -92,15 +92,14 @@ pub unsafe fn Exedit_GetWindow(fp: &FILTER) -> HWND {
 }
 
 unsafe fn Exedit_GetFilter(fp: &FILTER) -> Option<&FILTER> {
-    let i = auls_aviutl::AviUtl_GetFilterNumber(fp);
+    let i = auls_aviutl::AviUtl_GetFilterNumber(fp)?;
     fn exedit_getfilter_internal(fp: &FILTER, number: i32) -> Option<&FILTER> {
-        if number == 0 {
+        if number <= 0 {
             return None;
         }
         unsafe {
-            let exedit = fp.exfunc.unwrap().as_ref().get_filterp.unwrap()(number)
-                .map(|x| x.cast::<FILTER>().as_ref())
-                .unwrap();
+            let exedit =
+                fp.exfunc?.as_ref().get_filterp?(number).map(|x| x.cast::<FILTER>().as_ref())?;
 
             if slice::from_raw_parts(exedit.name.0, 9) == &EXEDIT_NAME[..] {
                 Some(exedit)

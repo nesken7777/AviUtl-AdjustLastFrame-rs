@@ -4,10 +4,10 @@ use crate::filter::*;
 use crate::yulib_file;
 use crate::yulib_generic;
 use crate::yulib_memory;
+use crate::Errors;
 use core::ffi::c_void;
 use core::slice;
 use windows::core::s;
-use windows::core::Error;
 use windows::core::{PCSTR, PSTR};
 use windows::Win32::Foundation::HANDLE;
 use windows::Win32::Foundation::HMODULE;
@@ -58,7 +58,7 @@ pub struct CMemref {
 }
 
 impl CMemref {
-    pub unsafe fn Init(&mut self, fp: &FILTER) -> Result<(), Error> {
+    pub unsafe fn Init(&mut self, fp: &FILTER) -> Result<(), Errors> {
         let handle = LoadLibraryExA(
             PCSTR(b"exedit.auf\0".as_ptr()),
             HANDLE(0),
@@ -68,7 +68,7 @@ impl CMemref {
         self.loadAddress(fp)
     }
 
-    unsafe fn loadAddress(&mut self, fp: &FILTER) -> Result<(), Error> {
+    unsafe fn loadAddress(&mut self, fp: &FILTER) -> Result<(), Errors> {
         let mut iniFilePath: PathType = [b'\0'; MAX_PATH as usize];
         GetModuleFileNameA((*fp).dll_hinst, iniFilePath.as_mut_slice());
         PathRemoveFileSpecA(PSTR(iniFilePath.as_mut_ptr()));
@@ -98,158 +98,158 @@ impl CMemref {
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_StaticFilterTable"),
-        );
+        )?;
         self.m_Exedit_SortedObjectTable_LayerIndexEnd = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_SortedObjectTable_LayerIndexEnd"),
-        );
+        )?;
         self.m_Exedit_AliasNameBuffer = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_AliasNameBuffer"),
-        );
+        )?;
         self.m_Exedit_SortedObjectCount = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_SortedObjectCount"),
-        );
+        )?;
         self.m_Exedit_ObjDlg_CommandTarget = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_ObjDlg_CommandTarget"),
-        );
+        )?;
         self.m_Exedit_SortedObjectTable_LayerIndexBegin = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_SortedObjectTable_LayerIndexBegin"),
-        );
+        )?;
         self.m_Exedit_ObjDlg_FilterStatus = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_ObjDlg_FilterStatus"),
-        );
+        )?;
         self.m_Exedit_SortedObjectTable = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_SortedObjectTable"),
-        );
+        )?;
         self.m_Exedit_ObjDlg_ObjectIndex = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_ObjDlg_ObjectIndex"),
-        );
+        )?;
         self.m_Exedit_SceneSetting = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_SceneSetting"),
-        );
+        )?;
         self.m_Exedit_LoadedFilterTable = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_LoadedFilterTable"),
-        );
+        )?;
         self.m_Exedit_LayerSetting = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_LayerSetting"),
-        );
+        )?;
         self.m_Exedit_SceneDisplaying = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_SceneDisplaying"),
-        );
+        )?;
         self.m_Exedit_TextBuffer = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_TextBuffer"),
-        );
+        )?;
         self.m_Exedit_TraScript_ProcessingTrackBarIndex = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_TraScript_ProcessingTrackBarIndex"),
-        );
+        )?;
         self.m_Exedit_TraScript_ProcessingObjectIndex = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_TraScript_ProcessingObjectIndex"),
-        );
+        )?;
         self.m_Exedit_ScriptProcessingFilter = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_ScriptProcessingFilter"),
-        );
+        )?;
         self.m_Exedit_LuaState = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_LuaState"),
-        );
+        )?;
         self.m_Exedit_CameraZBuffer = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_CameraZBuffer"),
-        );
+        )?;
 
         self.m_Exedit_ObjectBufferInfo = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_ObjectBufferInfo"),
-        );
+        )?;
         self.m_Exedit_ObjectBufferInfo_exdata_size = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_ObjectBufferInfo_exdata_size"),
-        );
+        )?;
         self.m_Exedit_ObjectBufferInfo_max_data_num = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_ObjectBufferInfo_max_data_num"),
-        );
+        )?;
         self.m_Exedit_ObjectBufferInfo_data = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_ObjectBufferInfo_data"),
-        );
+        )?;
         self.m_Exedit_ObjectBufferInfo_exdata = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_ObjectBufferInfo_exdata"),
-        );
+        )?;
 
         self.m_Exedit_UndoInfo = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_UndoInfo"),
-        );
+        )?;
         self.m_Exedit_UndoInfo_current_id = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_UndoInfo_current_id"),
-        );
+        )?;
         self.m_Exedit_UndoInfo_write_offset = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_UndoInfo_write_offset"),
-        );
+        )?;
         self.m_Exedit_UndoInfo_object_num = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_UndoInfo_object_num"),
-        );
+        )?;
         self.m_Exedit_UndoInfo_buffer_ptr = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_UndoInfo_buffer_ptr"),
-        );
+        )?;
         self.m_Exedit_UndoInfo_buffer_size = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
             PCSTR(appName.as_ptr()),
             s!("Exedit_UndoInfo_buffer_size"),
-        );
+        )?;
         Ok(())
     }
 
-    unsafe fn getHex(path: PCSTR, appName: PCSTR, keyName: PCSTR) -> u32 {
+    unsafe fn getHex(path: PCSTR, appName: PCSTR, keyName: PCSTR) -> Result<u32, Errors> {
         let mut buffer: PathType = [b'\0'; MAX_PATH as usize];
 
         let l = GetPrivateProfileStringA(
@@ -259,11 +259,7 @@ impl CMemref {
             Some(buffer.as_mut_slice()),
             path,
         );
-        let value = u32::from_str_radix(core::str::from_utf8(&buffer[0..l as usize]).unwrap(), 16);
-        match value {
-            Ok(some) => some,
-            Err(_) => panic!(),
-        }
+        u32::from_str_radix(core::str::from_utf8(&buffer[0..l as usize])?, 16).map_err(|e| e.into())
     }
 
     pub unsafe fn Exedit_SceneDisplaying(&self) -> i32 {
