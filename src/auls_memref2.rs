@@ -58,11 +58,7 @@ pub struct CMemref {
 
 impl CMemref {
     pub unsafe fn Init(&mut self, fp: &FILTER) -> Result<(), Errors> {
-        let handle = LoadLibraryExA(
-            PCSTR(b"exedit.auf\0".as_ptr()),
-            HANDLE(0),
-            LOAD_WITH_ALTERED_SEARCH_PATH,
-        )?;
+        let handle = LoadLibraryExA(s!("exedit.auf"), HANDLE(0), LOAD_WITH_ALTERED_SEARCH_PATH)?;
         self.m_exedit = handle;
         self.loadAddress(fp)
     }
@@ -71,7 +67,7 @@ impl CMemref {
         let mut iniFilePath: PathType = [b'\0'; MAX_PATH as usize];
         GetModuleFileNameA((*fp).dll_hinst, iniFilePath.as_mut_slice());
         PathRemoveFileSpecA(PSTR(iniFilePath.as_mut_ptr()));
-        PathAppendA(&mut iniFilePath, PCSTR(b"auls_memref.ini\0".as_ptr()));
+        PathAppendA(&mut iniFilePath, s!("auls_memref.ini"));
         let mut appName: PathType = [b'\0'; MAX_PATH as usize];
         {
             let mut path: PathType = [b'\0'; MAX_PATH as usize];
@@ -86,12 +82,18 @@ impl CMemref {
                 filesize as u32,
             )?;
             let crc32 = yulib_generic::Crc32(std::slice::from_raw_parts(fileData.mem, filesize));
-            let crc32ptr = &crc32 as *const u32 as *const i8;
             let mut temp: [u8; 9] = [0; 9];
-            wvnsprintfA(temp.as_mut_slice(), PCSTR("%08X".as_ptr()), crc32ptr);
-            for i in 0..temp.len() {
-                appName[i] = *temp.as_ptr().add(i);
-            }
+            wvnsprintfA(
+                temp.as_mut_slice(),
+                s!("%08X"),
+                (&crc32 as *const u32).cast::<i8>(),
+            );
+            appName[0..temp.len()]
+                .iter_mut()
+                .zip(temp.iter())
+                .for_each(|(dest, src)| {
+                    *dest = *src;
+                });
         }
         self.m_Exedit_StaticFilterTable = Self::getHex(
             PCSTR(iniFilePath.as_ptr()),
@@ -254,7 +256,7 @@ impl CMemref {
         let l = GetPrivateProfileStringA(
             appName,
             keyName,
-            PCSTR(b"\0".as_ptr()),
+            s!(""),
             Some(buffer.as_mut_slice()),
             path,
         );
