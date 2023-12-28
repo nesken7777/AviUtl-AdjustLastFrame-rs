@@ -5,7 +5,6 @@ use crate::yulib_file;
 use crate::yulib_generic;
 use crate::yulib_memory;
 use crate::Errors;
-use core::ffi::c_void;
 use core::slice;
 use windows::core::s;
 use windows::core::{PCSTR, PSTR};
@@ -86,7 +85,7 @@ impl CMemref {
                 slice::from_raw_parts_mut(fileData.mem, fileData.size),
                 filesize as u32,
             )?;
-            let crc32 = yulib_generic::Crc32_2(fileData.mem as *mut c_void, filesize as u32);
+            let crc32 = yulib_generic::Crc32(std::slice::from_raw_parts(fileData.mem, filesize));
             let crc32ptr = &crc32 as *const u32 as *const i8;
             let mut temp: [u8; 9] = [0; 9];
             wvnsprintfA(temp.as_mut_slice(), PCSTR("%08X".as_ptr()), crc32ptr);
