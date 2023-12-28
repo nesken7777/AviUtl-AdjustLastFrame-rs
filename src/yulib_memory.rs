@@ -31,7 +31,7 @@ impl<T> Drop for CMemory<T> {
 }
 
 impl<T> CMemory<T> {
-    pub unsafe fn Alloc(&mut self, size: usize, zeroinit: bool) -> Result<(), Error> {
+    pub fn Alloc(&mut self, size: usize, zeroinit: bool) -> Result<(), Error> {
         if self.mem.is_null() {
             self.mem = MemAlloc(size * size_of::<T>(), zeroinit)? as *mut T;
             self.size = size;
@@ -46,21 +46,25 @@ impl<T> CMemory<T> {
     }
 }
 
-unsafe fn MemAlloc(size: usize, zeroinit: bool) -> Result<*mut c_void, Error> {
-    Ok(HeapAlloc(
-        GetProcessHeap()?,
-        zeroinit.then_some(HEAP_ZERO_MEMORY).unwrap_or(HEAP_NONE),
-        size,
-    ))
+fn MemAlloc(size: usize, zeroinit: bool) -> Result<*mut c_void, Error> {
+    unsafe {
+        Ok(HeapAlloc(
+            GetProcessHeap()?,
+            zeroinit.then_some(HEAP_ZERO_MEMORY).unwrap_or(HEAP_NONE),
+            size,
+        ))
+    }
 }
 
-unsafe fn MemReAlloc(mem: *mut c_void, size: usize, zeroinit: bool) -> Result<*mut c_void, Error> {
-    Ok(HeapReAlloc(
-        GetProcessHeap()?,
-        zeroinit.then_some(HEAP_ZERO_MEMORY).unwrap_or(HEAP_NONE),
-        Some(mem),
-        size,
-    ))
+fn MemReAlloc(mem: *mut c_void, size: usize, zeroinit: bool) -> Result<*mut c_void, Error> {
+    unsafe {
+        Ok(HeapReAlloc(
+            GetProcessHeap()?,
+            zeroinit.then_some(HEAP_ZERO_MEMORY).unwrap_or(HEAP_NONE),
+            Some(mem),
+            size,
+        ))
+    }
 }
 
 fn Memfree(mem: *mut c_void) -> Result<(), Error> {

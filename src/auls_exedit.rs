@@ -86,12 +86,12 @@ impl TRACK_MODE {
     }
 }
 
-pub unsafe fn Exedit_GetWindow(fp: &FILTER) -> HWND {
+pub fn Exedit_GetWindow(fp: &FILTER) -> HWND {
     let exedit = Exedit_GetFilter(fp);
     exedit.map_or(HWND(0), |exedit| exedit.hwnd)
 }
 
-unsafe fn Exedit_GetFilter(fp: &FILTER) -> Option<&FILTER> {
+fn Exedit_GetFilter(fp: &FILTER) -> Option<&FILTER> {
     let i = auls_aviutl::AviUtl_GetFilterNumber(fp)?;
     fn exedit_getfilter_internal(fp: &FILTER, number: i32) -> Option<&FILTER> {
         if number <= 0 {

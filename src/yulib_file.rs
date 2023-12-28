@@ -32,34 +32,38 @@ impl Drop for CFile {
 }
 
 impl CFile {
-    pub unsafe fn OpenExisting(&mut self, filename: PCSTR) -> Result<(), Error> {
-        self.Close()?;
-        self.file = CreateFileA(
-            filename,
-            GENERIC_READ.0,
-            FILE_SHARE_NONE,
-            None,
-            OPEN_EXISTING,
-            FILE_ATTRIBUTE_NORMAL,
-            HANDLE(0),
-        )?;
-        Ok(())
-    }
-
-    pub unsafe fn Close(&mut self) -> Result<(), Error> {
-        if self.file == INVALID_HANDLE_VALUE {
-            return Ok(());
+    pub fn OpenExisting(&mut self, filename: PCSTR) -> Result<(), Error> {
+        unsafe {
+            self.Close()?;
+            self.file = CreateFileA(
+                filename,
+                GENERIC_READ.0,
+                FILE_SHARE_NONE,
+                None,
+                OPEN_EXISTING,
+                FILE_ATTRIBUTE_NORMAL,
+                HANDLE(0),
+            )?;
         }
-        CloseHandle(self.file)?;
-        self.file = INVALID_HANDLE_VALUE;
         Ok(())
     }
 
-    pub unsafe fn Size(&self) -> u32 {
-        GetFileSize(self.file, None)
+    pub fn Close(&mut self) -> Result<(), Error> {
+        unsafe {
+            if self.file == INVALID_HANDLE_VALUE {
+                return Ok(());
+            }
+            CloseHandle(self.file)?;
+            self.file = INVALID_HANDLE_VALUE;
+        }
+        Ok(())
     }
 
-    pub unsafe fn Read(&self, buf: &mut [u8], mut size: u32) -> Result<(), Error> {
-        ReadFile(self.file, Some(buf), Some(&mut size), None)
+    pub fn Size(&self) -> u32 {
+        unsafe { GetFileSize(self.file, None) }
+    }
+
+    pub fn Read(&self, buf: &mut [u8], mut size: u32) -> Result<(), Error> {
+        unsafe { ReadFile(self.file, Some(buf), Some(&mut size), None) }
     }
 }
