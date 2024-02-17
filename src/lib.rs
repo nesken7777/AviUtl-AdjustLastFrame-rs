@@ -9,13 +9,14 @@ pub mod yulib_generic;
 pub mod yulib_memory;
 use crate::filter::*;
 use auls_memref2::CMemref;
-use std::ptr::null_mut;
 use std::num::ParseIntError;
+use std::ptr::null_mut;
 use std::ptr::NonNull;
 use std::str::Utf8Error;
-use windows::core::{s, Error, PSTR};
+use windows::core::{s, Error, PSTR,PCSTR};
 use windows::Win32::Foundation::{BOOL, HINSTANCE, HMODULE, HWND, LPARAM, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
+include!(concat!(env!("OUT_DIR"), "/const_gen.rs"));
 pub enum Errors {
     WinApi(Error),
     ParseInt(ParseIntError),
@@ -120,7 +121,7 @@ pub unsafe extern "system" fn GetFilterTable() -> *mut FILTER_DLL {
             | FILTER_FLAG_EX_INFORMATION,
         x: 0,
         y: 0,
-        name: s!("AdjustLastFrame-rs"),
+        name: PCSTR::from_raw(FILTER_NAME.as_ptr()),
         track_n: 0,
         track_name: None,
         track_default: None,
@@ -138,7 +139,7 @@ pub unsafe extern "system" fn GetFilterTable() -> *mut FILTER_DLL {
         check: None,
         ex_data_ptr: None,
         ex_data_size: 0,
-        information: s!("AdjustLastFrame-rs v1.0.0(rewrited by nesken7777)"),
+        information: PCSTR::from_raw(FILTER_INFORMATION.as_ptr()),
         func_save_start: None,
         exfunc: None,
         hwnd: HWND(0),
