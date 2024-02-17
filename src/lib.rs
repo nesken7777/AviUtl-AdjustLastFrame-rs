@@ -13,7 +13,7 @@ use std::num::ParseIntError;
 use std::ptr::null_mut;
 use std::ptr::NonNull;
 use std::str::Utf8Error;
-use windows::core::{s, Error, PSTR,PCSTR};
+use windows::core::{Error, PSTR,PCSTR};
 use windows::Win32::Foundation::{BOOL, HINSTANCE, HMODULE, HWND, LPARAM, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
 include!(concat!(env!("OUT_DIR"), "/const_gen.rs"));
