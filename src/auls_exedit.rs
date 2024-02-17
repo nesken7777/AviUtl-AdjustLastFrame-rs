@@ -6,7 +6,7 @@ use crate::auls_aviutl;
 use crate::filter::FILTER;
 use std::slice;
 use windows::Win32::Foundation::HWND;
-include!(concat!(env!("OUT_DIR"), "/const_gen.rs"));
+include!(concat!(env!("OUT_DIR"), "/exedit_name.rs"));
 
 const MAX_FILTER: usize = 12;
 const MAX_TRACK: usize = 64;

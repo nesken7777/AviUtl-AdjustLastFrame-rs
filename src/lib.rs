@@ -16,7 +16,7 @@ use std::str::Utf8Error;
 use windows::core::{Error, PSTR,PCSTR};
 use windows::Win32::Foundation::{BOOL, HINSTANCE, HMODULE, HWND, LPARAM, WPARAM};
 use windows::Win32::UI::WindowsAndMessaging::{PostMessageA, WM_COMMAND};
-include!(concat!(env!("OUT_DIR"), "/const_gen.rs"));
+include!(concat!(env!("OUT_DIR"), "/filter_info.rs"));
 pub enum Errors {
     WinApi(Error),
     ParseInt(ParseIntError),
